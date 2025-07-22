@@ -15,7 +15,7 @@ export default function PostActions({ postId, authorId }: PostActionsProps) {
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const isAuthor = session?.user?.id === authorId
+  const isAuthor = session?.user?.id === authorId.toString()
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUB_ADMIN'
   const canEdit = isAuthor || isAdmin
 
