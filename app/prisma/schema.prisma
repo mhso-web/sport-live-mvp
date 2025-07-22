@@ -33,6 +33,14 @@ model User {
   analysisFeedback AnalysisFeedback[]
   chatMessages    ChatMessage[]
   
+  // 새로 추가된 관계들
+  createdPartners Partner[]
+  partnerRatings  PartnerRating[]
+  partnerComments PartnerComment[]
+  partnerLikes    PartnerLike[]
+  inquiries       Inquiry[]
+  inquiryResponses InquiryResponse[]
+  
   @@index([username])
   @@index([email])
   @@index([level])
@@ -44,6 +52,7 @@ enum Role {
   USER
   ANALYST
   MODERATOR
+  SUB_ADMIN
   ADMIN
 }
 
@@ -344,4 +353,147 @@ model AdBanner {
   @@index([isActive, startDate, endDate])
   @@index([priority(sort: Desc)])
   @@map("ad_banners")
+}
+
+// 보증업체 관련 모델
+model Partner {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique
+  description  String?
+  detailContent String   @db.Text @map("detail_content")
+  bannerImage  String?   @map("banner_image")
+  websiteUrl   String?   @map("website_url")
+  isActive     Boolean   @default(true) @map("is_active")
+  viewCount    Int       @default(0) @map("view_count")
+  createdBy    Int       @map("created_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  creator      User             @relation(fields: [createdBy], references: [id])
+  ratings      PartnerRating[]
+  comments     PartnerComment[]
+  likes        PartnerLike[]
+
+  @@index([isActive, createdAt(sort: Desc)])
+  @@index([name])
+  @@map("partners")
+}
+
+model PartnerRating {
+  id         Int      @id @default(autoincrement())
+  partnerId  Int      @map("partner_id")
+  userId     Int      @map("user_id")
+  rating     Int      // 1-5
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  partner    Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([partnerId, userId])
+  @@index([partnerId])
+  @@index([userId])
+  @@map("partner_ratings")
+}
+
+model PartnerComment {
+  id         Int      @id @default(autoincrement())
+  partnerId  Int      @map("partner_id")
+  userId     Int      @map("user_id")
+  content    String   @db.Text
+  isDeleted  Boolean  @default(false) @map("is_deleted")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  partner    Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([partnerId, createdAt(sort: Desc)])
+  @@index([userId])
+  @@map("partner_comments")
+}
+
+model PartnerLike {
+  id         Int      @id @default(autoincrement())
+  partnerId  Int      @map("partner_id")
+  userId     Int      @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  partner    Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([partnerId, userId])
+  @@index([partnerId])
+  @@index([userId])
+  @@map("partner_likes")
+}
+
+// 실시간 중계 관련 모델
+model LiveMatch {
+  id            Int           @id @default(autoincrement())
+  sportType     SportType     @map("sport_type")
+  region        MatchRegion
+  homeTeam      String        @map("home_team")
+  awayTeam      String        @map("away_team")
+  homeScore     Int           @default(0) @map("home_score")
+  awayScore     Int           @default(0) @map("away_score")
+  status        MatchStatus   @default(SCHEDULED)
+  scheduledTime DateTime      @map("scheduled_time")
+  actualStartTime DateTime?   @map("actual_start_time")
+  actualEndTime DateTime?     @map("actual_end_time")
+  streamUrl     String?       @map("stream_url")
+  thumbnailUrl  String?       @map("thumbnail_url")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@index([sportType, status, scheduledTime])
+  @@index([status, scheduledTime])
+  @@index([region, sportType])
+  @@map("live_matches")
+}
+
+enum MatchRegion {
+  DOMESTIC
+  INTERNATIONAL
+}
+
+// 1:1 문의 관련 모델
+model Inquiry {
+  id         Int            @id @default(autoincrement())
+  userId     Int            @map("user_id")
+  title      String
+  content    String         @db.Text
+  status     InquiryStatus  @default(PENDING)
+  isDeleted  Boolean        @default(false) @map("is_deleted")
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+
+  user       User           @relation(fields: [userId], references: [id])
+  responses  InquiryResponse[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("inquiries")
+}
+
+model InquiryResponse {
+  id         Int      @id @default(autoincrement())
+  inquiryId  Int      @map("inquiry_id")
+  adminId    Int      @map("admin_id")
+  content    String   @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  inquiry    Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  admin      User     @relation(fields: [adminId], references: [id])
+
+  @@index([inquiryId])
+  @@map("inquiry_responses")
+}
+
+enum InquiryStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }

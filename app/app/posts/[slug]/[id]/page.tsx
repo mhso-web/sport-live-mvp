@@ -1,0 +1,221 @@
+import { Metadata } from 'next'
+import Link from 'next/link'
+import Navigation from '@/components/layout/Navigation'
+import { notFound } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
+import { formatDistanceToNow } from 'date-fns'
+import { ko } from 'date-fns/locale'
+import PostViewCounter from '@/components/posts/PostViewCounter'
+import PostActions from '@/components/posts/PostActions'
+import CommentSection from '@/components/posts/CommentSection'
+
+interface Props {
+  params: {
+    slug: string
+    id: string
+  }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = await getPost(parseInt(params.id))
+
+  if (!post) {
+    return {
+      title: '게시글을 찾을 수 없습니다 - Sports Live',
+      description: '요청하신 게시글을 찾을 수 없습니다.'
+    }
+  }
+
+  return {
+    title: `${post.title} - ${post.category?.name || '게시판'} - Sports Live`,
+    description: post.summary || post.content.substring(0, 160),
+    keywords: ['스포츠', '커뮤니티', post.category?.name || '', post.title],
+  }
+}
+
+async function getPost(id: number) {
+  const post = await prisma.post.findUnique({
+    where: { 
+      id,
+      isDeleted: false 
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          profileImage: true,
+          level: true,
+          role: true
+        }
+      },
+      category: true,
+      comments: {
+        where: { 
+          isDeleted: false,
+          parentId: null 
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              profileImage: true,
+              level: true
+            }
+          },
+          replies: {
+            where: { isDeleted: false },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  profileImage: true,
+                  level: true
+                }
+              }
+            },
+            orderBy: { createdAt: 'asc' }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      },
+      _count: {
+        select: {
+          comments: { where: { isDeleted: false } },
+          likes: true
+        }
+      }
+    }
+  })
+
+  return post
+}
+
+export default async function PostDetailPage({ params }: Props) {
+  const id = parseInt(params.id)
+  if (isNaN(id)) {
+    notFound()
+  }
+
+  const post = await getPost(id)
+  if (!post) {
+    notFound()
+  }
+
+  // 카테고리 slug 확인
+  if (post.category && post.category.slug !== params.slug) {
+    notFound()
+  }
+
+  return (
+    <>
+      <Navigation />
+      <PostViewCounter postId={post.id} />
+      <main className="min-h-screen bg-dark-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* 브레드크럼 */}
+          <nav className="mb-6">
+            <ol className="flex items-center space-x-2 text-sm">
+              <li>
+                <Link href="/posts" className="text-gray-400 hover:text-gold-500 transition-colors">
+                  게시판
+                </Link>
+              </li>
+              <li className="text-gray-600">/</li>
+              <li>
+                <Link 
+                  href={`/posts/${post.category?.slug}`} 
+                  className="text-gray-400 hover:text-gold-500 transition-colors"
+                >
+                  {post.category?.name}
+                </Link>
+              </li>
+              <li className="text-gray-600">/</li>
+              <li className="text-gray-300">{post.title}</li>
+            </ol>
+          </nav>
+
+          {/* 게시글 헤더 */}
+          <div className="bg-dark-800 rounded-lg border border-dark-700 overflow-hidden">
+            <div className="p-6">
+              {/* 제목 */}
+              <h1 className="text-2xl font-bold text-gray-100 mb-4">
+                {post.isPinned && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/30 text-red-400 border border-red-800/50 mr-3">
+                    📌 고정
+                  </span>
+                )}
+                {post.title}
+              </h1>
+
+              {/* 작성자 정보 */}
+              <div className="flex items-center justify-between mb-6 pb-6 border-b border-dark-700">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-dark-700 rounded-full flex items-center justify-center">
+                    <span className="text-lg">👤</span>
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-gray-100">{post.user.username}</span>
+                      <span className="text-xs bg-gold-900/30 text-gold-400 px-2 py-0.5 rounded">
+                        Lv.{post.user.level}
+                      </span>
+                      {post.user.role === 'ADMIN' && (
+                        <span className="text-xs bg-red-900/30 text-red-400 px-2 py-0.5 rounded">
+                          관리자
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-3 text-sm text-gray-500 mt-1">
+                      <time dateTime={post.createdAt.toISOString()}>
+                        {formatDistanceToNow(post.createdAt, { addSuffix: true, locale: ko })}
+                      </time>
+                      <span>•</span>
+                      <span>조회 {post.views.toLocaleString()}</span>
+                      <span>•</span>
+                      <span>댓글 {post._count.comments}</span>
+                      <span>•</span>
+                      <span>좋아요 {post._count.likes}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <PostActions postId={post.id} authorId={post.user.id} />
+              </div>
+
+              {/* 게시글 내용 */}
+              <div className="prose prose-invert max-w-none">
+                <div 
+                  className="text-gray-300 leading-relaxed whitespace-pre-wrap"
+                  dangerouslySetInnerHTML={{ 
+                    __html: post.content.replace(/\n/g, '<br>') 
+                  }}
+                />
+              </div>
+
+              {/* 좋아요 버튼 */}
+              <div className="mt-8 pt-6 border-t border-dark-700 flex justify-center">
+                <button className="flex items-center space-x-2 px-6 py-3 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-gold-500 rounded-lg transition-all duration-200">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>좋아요</span>
+                  <span className="font-medium">{post._count.likes}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 댓글 섹션 */}
+          <CommentSection 
+            postId={post.id} 
+            comments={post.comments} 
+            commentCount={post._count.comments}
+          />
+        </div>
+      </main>
+    </>
+  )
+}

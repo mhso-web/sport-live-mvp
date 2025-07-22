@@ -61,3 +61,39 @@ export class InternalServerError extends AppError {
     super(message)
   }
 }
+
+// API error handler for Next.js route handlers
+export function handleApiError(error: unknown) {
+  console.error('API Error:', error)
+
+  if (error instanceof AppError) {
+    return Response.json(
+      {
+        error: error.message,
+        errors: error instanceof ValidationError ? error.errors : undefined,
+        success: false
+      },
+      { status: error.statusCode }
+    )
+  }
+
+  if (error instanceof Error) {
+    return Response.json(
+      {
+        error: process.env.NODE_ENV === 'production' 
+          ? 'Internal server error' 
+          : error.message,
+        success: false
+      },
+      { status: 500 }
+    )
+  }
+
+  return Response.json(
+    {
+      error: 'Unknown error occurred',
+      success: false
+    },
+    { status: 500 }
+  )
+}

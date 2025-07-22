@@ -62,6 +62,18 @@ async function main() {
       orderIndex: 5,
       seoTitle: '농구 커뮤니티 게시판',
       seoKeywords: ['농구', 'KBL', 'NBA', '농구 커뮤니티']
+    },
+    // NOTICE 게시판
+    {
+      boardType: BoardType.NOTICE,
+      slug: 'notice',
+      name: '공지사항',
+      description: '서비스 공지사항 및 업데이트 소식',
+      icon: '📢',
+      color: '#DC2626',
+      orderIndex: 100,
+      seoTitle: '스포츠 라이브 공지사항',
+      seoKeywords: ['공지사항', '업데이트', '서비스 안내']
     }
   ]
 
