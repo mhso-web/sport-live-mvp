@@ -69,16 +69,14 @@ export default function RegisterForm() {
       }
 
       // Registration successful - auto login
-      const loginResponse = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password
-        })
+      const { signIn } = await import('next-auth/react')
+      const result = await signIn('credentials', {
+        username: formData.username,
+        password: formData.password,
+        redirect: false
       })
 
-      if (loginResponse.ok) {
+      if (result?.ok) {
         router.push('/')
         router.refresh()
       }
