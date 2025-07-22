@@ -93,6 +93,14 @@ async function getPost(id: number) {
   return post
 }
 
+// 댓글 데이터를 재귀적으로 변환하는 헬퍼 함수
+function transformComments(comments: any[]): any[] {
+  return comments.map(comment => ({
+    ...comment,
+    replies: comment.replies ? transformComments(comment.replies) : []
+  }))
+}
+
 export default async function PostDetailPage({ params }: Props) {
   const id = parseInt(params.id)
   if (isNaN(id)) {
@@ -211,7 +219,7 @@ export default async function PostDetailPage({ params }: Props) {
           {/* 댓글 섹션 */}
           <CommentSection 
             postId={post.id} 
-            comments={post.comments} 
+            comments={transformComments(post.comments)} 
             commentCount={post._count.comments}
           />
         </div>
