@@ -1,0 +1,316 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  username        String   @unique @db.VarChar(50)
+  email           String   @unique @db.VarChar(100)
+  passwordHash    String   @map("password_hash")
+  experience      Int      @default(0)
+  level           Int      @default(1)
+  role            Role     @default(USER)
+  profileImage    String?  @map("profile_image")
+  bio             String?
+  isActive        Boolean  @default(true) @map("is_active")
+  lastLoginAt     DateTime? @map("last_login_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  posts           Post[]
+  comments        Comment[]
+  badges          UserBadge[]
+  experienceLogs  UserExperienceLog[]
+  postLikes       PostLike[]
+  analysisFeedback AnalysisFeedback[]
+  chatMessages    ChatMessage[]
+  
+  @@index([username])
+  @@index([email])
+  @@index([level])
+  @@index([createdAt(sort: Desc)])
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ANALYST
+  MODERATOR
+  ADMIN
+}
+
+model UserBadge {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  badgeType  String   @map("badge_type") @db.VarChar(50)
+  badgeLevel Int      @default(1) @map("badge_level")
+  earnedAt   DateTime @default(now()) @map("earned_at")
+  metadata   Json?
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, badgeType])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+model UserExperienceLog {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  actionType       String   @map("action_type") @db.VarChar(50)
+  experienceGained Int      @map("experience_gained")
+  description      String?
+  metadata         Json?
+  createdAt        DateTime @default(now()) @map("created_at")
+  
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("user_experience_logs")
+}
+
+model Post {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @map("user_id")
+  boardType     BoardType @map("board_type")
+  title         String    @db.VarChar(200)
+  content       String    @db.Text
+  summary       String?   @db.Text
+  views         Int       @default(0)
+  likesCount    Int       @default(0) @map("likes_count")
+  commentsCount Int       @default(0) @map("comments_count")
+  isPinned      Boolean   @default(false) @map("is_pinned")
+  isDeleted     Boolean   @default(false) @map("is_deleted")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments      Comment[]
+  likes         PostLike[]
+  
+  @@index([userId])
+  @@index([boardType])
+  @@index([createdAt(sort: Desc)])
+  @@index([isDeleted])
+  @@index([boardType, createdAt(sort: Desc)])
+  @@map("posts")
+}
+
+enum BoardType {
+  COMMUNITY @map("community")
+  ANALYSIS  @map("analysis")
+  NOTICE    @map("notice")
+  EVENT     @map("event")
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  postId      Int      @map("post_id")
+  userId      Int      @map("user_id")
+  parentId    Int?     @map("parent_id")
+  content     String   @db.Text
+  likesCount  Int      @default(0) @map("likes_count")
+  isDeleted   Boolean  @default(false) @map("is_deleted")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[] @relation("CommentReplies")
+  
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+model PostLike {
+  id        Int      @id @default(autoincrement())
+  postId    Int      @map("post_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([postId, userId])
+  @@index([userId])
+  @@map("post_likes")
+}
+
+model Match {
+  id             Int      @id @default(autoincrement())
+  externalId     String?  @map("external_id") @db.VarChar(100)
+  sportType      SportType @map("sport_type")
+  league         String?  @db.VarChar(50)
+  season         String?  @db.VarChar(20)
+  homeTeam       String   @map("home_team") @db.VarChar(100)
+  awayTeam       String   @map("away_team") @db.VarChar(100)
+  homeTeamLogo   String?  @map("home_team_logo")
+  awayTeamLogo   String?  @map("away_team_logo")
+  scheduledTime  DateTime @map("scheduled_time")
+  status         MatchStatus @default(SCHEDULED)
+  currentMinute  Int?     @map("current_minute")
+  homeScore      Int      @default(0) @map("home_score")
+  awayScore      Int      @default(0) @map("away_score")
+  venue          String?  @db.VarChar(200)
+  attendance     Int?
+  weatherInfo    Json?    @map("weather_info")
+  statistics     Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
+  events         MatchEvent[]
+  analyses       MatchAnalysis[]
+  chatMessages   ChatMessage[]
+  
+  @@index([scheduledTime])
+  @@index([status])
+  @@index([sportType])
+  @@index([homeTeam, awayTeam])
+  @@map("matches")
+}
+
+enum SportType {
+  SOCCER @map("soccer")
+  BASEBALL @map("baseball")
+  BASKETBALL @map("basketball")
+}
+
+enum MatchStatus {
+  SCHEDULED @map("scheduled")
+  LIVE @map("live")
+  FINISHED @map("finished")
+  CANCELLED @map("cancelled")
+}
+
+model MatchEvent {
+  id           Int      @id @default(autoincrement())
+  matchId      Int      @map("match_id")
+  eventType    String   @map("event_type") @db.VarChar(50)
+  eventMinute  Int      @map("event_minute")
+  team         TeamSide?
+  playerName   String?  @map("player_name") @db.VarChar(100)
+  description  String?  @db.Text
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  match        Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  
+  @@index([matchId])
+  @@index([eventType])
+  @@index([eventMinute])
+  @@map("match_events")
+}
+
+enum TeamSide {
+  HOME @map("home")
+  AWAY @map("away")
+}
+
+model MatchAnalysis {
+  id              Int      @id @default(autoincrement())
+  matchId         Int      @map("match_id")
+  analysisType    AnalysisType @map("analysis_type")
+  title           String   @db.VarChar(200)
+  content         String   @db.Text
+  summary         String?  @db.Text
+  keyInsights     Json?    @map("key_insights")
+  predictions     Json?
+  confidenceScore Decimal? @map("confidence_score") @db.Decimal(3, 2)
+  aiModel         String?  @map("ai_model") @db.VarChar(50)
+  modelVersion    String?  @map("model_version") @db.VarChar(20)
+  tokensUsed      Int?     @map("tokens_used")
+  processingTimeMs Int?    @map("processing_time_ms")
+  createdBy       CreatedBy @default(AI) @map("created_by")
+  isPublished     Boolean  @default(true) @map("is_published")
+  createdAt       DateTime @default(now()) @map("created_at")
+  
+  match           Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  feedback        AnalysisFeedback[]
+  
+  @@unique([matchId, analysisType])
+  @@index([matchId])
+  @@index([analysisType])
+  @@index([createdAt(sort: Desc)])
+  @@map("match_analysis")
+}
+
+enum AnalysisType {
+  PREVIEW @map("preview")
+  LIVE @map("live")
+  REVIEW @map("review")
+}
+
+enum CreatedBy {
+  AI @map("ai")
+  ANALYST @map("analyst")
+}
+
+model AnalysisFeedback {
+  id           Int      @id @default(autoincrement())
+  analysisId   Int      @map("analysis_id")
+  userId       Int      @map("user_id")
+  rating       Int?
+  isAccurate   Boolean? @map("is_accurate")
+  feedbackText String?  @map("feedback_text") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  analysis     MatchAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([analysisId, userId])
+  @@index([analysisId])
+  @@map("analysis_feedback")
+}
+
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  matchId   Int      @map("match_id")
+  userId    Int      @map("user_id")
+  message   String   @db.Text
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([matchId])
+  @@index([createdAt(sort: Desc)])
+  @@map("chat_messages")
+}
+
+model AdBanner {
+  id             Int      @id @default(autoincrement())
+  position       String   @db.VarChar(50)
+  title          String?  @db.VarChar(200)
+  description    String?  @db.Text
+  imageUrl       String   @map("image_url") @db.VarChar(500)
+  linkUrl        String   @map("link_url") @db.VarChar(500)
+  advertiserName String?  @map("advertiser_name") @db.VarChar(100)
+  impressions    Int      @default(0)
+  clicks         Int      @default(0)
+  isActive       Boolean  @default(true) @map("is_active")
+  priority       Int      @default(0)
+  startDate      DateTime? @map("start_date")
+  endDate        DateTime? @map("end_date")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
+  @@index([position])
+  @@index([isActive, startDate, endDate])
+  @@index([priority(sort: Desc)])
+  @@map("ad_banners")
+}
