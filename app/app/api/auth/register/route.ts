@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const data = await request.json()
     const result = await authService.register(data)
-    return ApiResponse.success(result, null, 201)
+    return ApiResponse.success(result, {}, 201)
   } catch (error) {
     return ApiResponse.error(error)
   }
