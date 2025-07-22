@@ -190,8 +190,8 @@ export class PartnerRepository implements IRepository<Partner> {
     })
   }
 
-  async delete(id: number): Promise<Partner> {
-    return prisma.partner.update({
+  async delete(id: number): Promise<void> {
+    await prisma.partner.update({
       where: { id },
       data: { isActive: false }
     })
