@@ -78,10 +78,33 @@ model UserExperienceLog {
   @@map("user_experience_logs")
 }
 
+model BoardCategory {
+  id            Int       @id @default(autoincrement())
+  boardType     BoardType @map("board_type")
+  slug          String    @unique @db.VarChar(50)
+  name          String    @db.VarChar(100)
+  description   String?   @db.Text
+  orderIndex    Int       @default(0) @map("order_index")
+  isActive      Boolean   @default(true) @map("is_active")
+  icon          String?   @db.VarChar(50) // 이모지 또는 아이콘 클래스
+  color         String?   @db.VarChar(7)  // HEX 색상코드
+  seoTitle      String?   @map("seo_title") @db.VarChar(100)
+  seoKeywords   String[]  @map("seo_keywords")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  posts         Post[]
+  
+  @@index([boardType, orderIndex])
+  @@index([slug])
+  @@map("board_categories")
+}
+
 model Post {
   id            Int       @id @default(autoincrement())
   userId        Int       @map("user_id")
   boardType     BoardType @map("board_type")
+  categoryId    Int?      @map("category_id") // 커뮤니티 게시판인 경우 필수
   title         String    @db.VarChar(200)
   content       String    @db.Text
   summary       String?   @db.Text
@@ -94,7 +117,8 @@ model Post {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      BoardCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   comments      Comment[]
   likes         PostLike[]
   
@@ -103,14 +127,15 @@ model Post {
   @@index([createdAt(sort: Desc)])
   @@index([isDeleted])
   @@index([boardType, createdAt(sort: Desc)])
+  @@index([categoryId, createdAt(sort: Desc)])
   @@map("posts")
 }
 
 enum BoardType {
-  COMMUNITY @map("community")
-  ANALYSIS  @map("analysis")
-  NOTICE    @map("notice")
-  EVENT     @map("event")
+  COMMUNITY @map("community") // 커뮤니티 (하위 카테고리 있음)
+  ANALYSIS  @map("analysis")   // AI 분석
+  NOTICE    @map("notice")     // 공지사항
+  EVENT     @map("event")      // 이벤트
 }
 
 model Comment {
