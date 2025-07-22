@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth.config'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+
 const createCommentSchema = z.object({
   postId: z.number().int().positive(),
   content: z.string().min(1).max(1000),

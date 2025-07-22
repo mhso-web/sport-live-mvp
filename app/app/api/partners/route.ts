@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PartnerRepository } from '@/lib/repositories/partnerRepository'
 import { handleApiError } from '@/lib/errors'
 
+export const dynamic = 'force-dynamic'
+
 const partnerRepository = new PartnerRepository()
 
 export async function GET(request: NextRequest) {

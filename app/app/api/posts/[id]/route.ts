@@ -7,6 +7,8 @@ import { BoardCategoryRepository } from '@/lib/repositories/boardCategoryReposit
 import { UserRepository } from '@/lib/repositories/userRepository'
 import { handleApiError } from '@/lib/errors'
 
+export const dynamic = 'force-dynamic'
+
 const postRepository = new PostRepository()
 const boardCategoryRepository = new BoardCategoryRepository()
 const userRepository = new UserRepository()

@@ -8,6 +8,8 @@ import { UserRepository } from '@/lib/repositories/userRepository'
 import { handleApiError } from '@/lib/errors'
 import { BoardType } from '@prisma/client'
 
+export const dynamic = 'force-dynamic'
+
 const postRepository = new PostRepository()
 const boardCategoryRepository = new BoardCategoryRepository()
 const userRepository = new UserRepository()

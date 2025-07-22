@@ -3,6 +3,8 @@ import { BoardService } from '@/lib/services/boardService'
 import { BoardCategoryRepository } from '@/lib/repositories/boardCategoryRepository'
 import { handleApiError } from '@/lib/errors'
 
+export const dynamic = 'force-dynamic'
+
 const boardService = new BoardService(new BoardCategoryRepository())
 
 export async function GET(
