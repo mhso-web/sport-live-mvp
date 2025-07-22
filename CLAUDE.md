@@ -117,3 +117,39 @@ python -m scripts.analyze --match-id 123
 ## Current Focus
 
 Working on Phase 1: Foundation (auth, boards, basic features)
+
+## Important: API Development Guidelines
+
+When developing API endpoints, **MUST** follow the patterns in `/docs/api-development-guide.md`:
+- Service Layer Pattern (business logic separation)
+- Repository Pattern (data access abstraction)  
+- DTO Pattern (data validation and transformation)
+- Standardized error handling
+- Consistent API responses
+
+**Never** put business logic directly in API routes! API routes should only:
+1. Parse request data
+2. Call service methods
+3. Return standardized responses
+
+Example:
+```typescript
+// ✅ GOOD - API route as thin controller
+export async function POST(request: Request) {
+  try {
+    const data = await request.json()
+    const result = await postService.create(data, request)
+    return ApiResponse.success(result)
+  } catch (error) {
+    return ApiResponse.error(error)
+  }
+}
+
+// ❌ BAD - Business logic in API route
+export async function POST(request: Request) {
+  const data = await request.json()
+  if (!data.title) { ... }  // Don't do validation here
+  const post = await prisma.post.create({ ... })  // Don't access DB directly
+  return NextResponse.json(post)
+}
+```
