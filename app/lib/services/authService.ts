@@ -9,7 +9,7 @@ import type { User } from '@prisma/client'
 
 export interface AuthTokenPayload {
   userId: number
-  email: string
+  email: string | null
   username: string
   role: string
 }
@@ -17,7 +17,7 @@ export interface AuthTokenPayload {
 export interface AuthResponse {
   user: {
     id: number
-    email: string
+    email: string | null
     username: string
     role: string
     level: number
