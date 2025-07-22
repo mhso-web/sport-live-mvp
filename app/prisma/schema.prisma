@@ -156,6 +156,7 @@ model Match {
   sportType      SportType @map("sport_type")
   league         String?  @db.VarChar(50)
   season         String?  @db.VarChar(20)
+  country        String?  @db.VarChar(50) // 국가 구분
   homeTeam       String   @map("home_team") @db.VarChar(100)
   awayTeam       String   @map("away_team") @db.VarChar(100)
   homeTeamLogo   String?  @map("home_team_logo")
@@ -169,6 +170,7 @@ model Match {
   attendance     Int?
   weatherInfo    Json?    @map("weather_info")
   statistics     Json?
+  metadata       Json?    // e스포츠 게임명, 토너먼트 등 추가 정보
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
   
@@ -187,6 +189,10 @@ enum SportType {
   SOCCER @map("soccer")
   BASEBALL @map("baseball")
   BASKETBALL @map("basketball")
+  ESPORTS @map("esports")
+  VOLLEYBALL @map("volleyball")
+  TENNIS @map("tennis")
+  GOLF @map("golf")
 }
 
 enum MatchStatus {
