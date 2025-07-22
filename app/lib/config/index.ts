@@ -12,14 +12,14 @@ const ConfigSchema = z.object({
   NEXTAUTH_SECRET: z.string().min(32),
   JWT_SECRET: z.string().min(32).optional(),
   
-  // Redis
-  REDIS_URL: z.string(),
+  // Redis (optional for initial deployment)
+  REDIS_URL: z.string().optional(),
   
-  // Socket.io
-  NEXT_PUBLIC_SOCKET_URL: z.string().url(),
+  // Socket.io (optional for initial deployment)
+  NEXT_PUBLIC_SOCKET_URL: z.string().url().optional(),
   
   // External API (for future separation)
-  USE_EXTERNAL_API: z.string().transform(val => val === 'true').default('false'),
+  USE_EXTERNAL_API: z.string().transform(val => val === 'true').default('false').optional(),
   API_BASE_URL: z.string().url().optional(),
 })
 
