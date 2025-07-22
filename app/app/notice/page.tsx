@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '공지사항 - Sports Live',
   description: '스포츠 라이브의 공지사항 및 업데이트 소식을 확인하세요.',

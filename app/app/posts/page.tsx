@@ -6,6 +6,8 @@ import { BoardCategoryRepository } from '@/lib/repositories/boardCategoryReposit
 import { PostRepository } from '@/lib/repositories/postRepository'
 import { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '게시판 - Sports Live',
   description: '스포츠 라이브의 모든 게시판을 한눈에 확인하세요. 축구, 야구, 농구, e스포츠 등 다양한 스포츠 커뮤니티',
