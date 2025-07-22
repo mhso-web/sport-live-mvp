@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '20'),
       orderBy: searchParams.get('orderBy') || 'createdAt',
-      orderDir: (searchParams.get('orderDir') || 'desc') as 'asc' | 'desc'
+      order: (searchParams.get('orderDir') || 'desc') as 'asc' | 'desc'
     }
 
     const result = await postService.findAll(filters, pagination)

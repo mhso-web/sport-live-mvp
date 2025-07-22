@@ -55,7 +55,7 @@ export class InquiryRepository implements IRepository<Inquiry> {
   }
 
   async findAll(params?: PaginationParams): Promise<PaginatedResult<Inquiry>> {
-    const { page = 1, limit = 20, orderBy = 'createdAt', orderDir = 'desc' } = params || {}
+    const { page = 1, limit = 20, orderBy = 'createdAt', order = 'desc' } = params || {}
     const skip = (page - 1) * limit
 
     const [data, total] = await Promise.all([
@@ -63,7 +63,7 @@ export class InquiryRepository implements IRepository<Inquiry> {
         where: { isDeleted: false },
         skip,
         take: limit,
-        orderBy: { [orderBy]: orderDir }
+        orderBy: { [orderBy]: order }
       }),
       prisma.inquiry.count({ where: { isDeleted: false } })
     ])
@@ -85,7 +85,7 @@ export class InquiryRepository implements IRepository<Inquiry> {
     filters: InquiryFilters,
     params?: PaginationParams
   ): Promise<PaginatedResult<InquiryWithRelations>> {
-    const { page = 1, limit = 20, orderBy = 'createdAt', orderDir = 'desc' } = params || {}
+    const { page = 1, limit = 20, orderBy = 'createdAt', order = 'desc' } = params || {}
     const skip = (page - 1) * limit
 
     const where: Prisma.InquiryWhereInput = {
@@ -128,7 +128,7 @@ export class InquiryRepository implements IRepository<Inquiry> {
         },
         skip,
         take: limit,
-        orderBy: { [orderBy]: orderDir }
+        orderBy: { [orderBy]: order }
       }),
       prisma.inquiry.count({ where })
     ])

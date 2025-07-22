@@ -75,14 +75,14 @@ export class PartnerRepository implements IRepository<Partner> {
   }
 
   async findAll(params?: PaginationParams): Promise<PaginatedResult<Partner>> {
-    const { page = 1, limit = 20, orderBy = 'createdAt', orderDir = 'desc' } = params || {}
+    const { page = 1, limit = 20, orderBy = 'createdAt', order = 'desc' } = params || {}
     const skip = (page - 1) * limit
 
     const [data, total] = await Promise.all([
       prisma.partner.findMany({
         skip,
         take: limit,
-        orderBy: { [orderBy]: orderDir }
+        orderBy: { [orderBy]: order }
       }),
       prisma.partner.count()
     ])

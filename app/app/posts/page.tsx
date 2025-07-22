@@ -46,7 +46,7 @@ async function getBoardsWithPosts() {
   for (const category of categories) {
     const result = await postRepo.findByFilters(
       { categorySlug: category.slug },
-      { limit: 6, orderBy: 'createdAt', orderDir: 'desc' }
+      { limit: 6, orderBy: 'createdAt', order: 'desc' }
     )
     
     if (result.data.length > 0) {
