@@ -14,7 +14,7 @@ export default async function ProfilePage() {
       <Navigation />
       <div className="min-h-screen bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="card-premium p-6">
+          <div className="card-premium p-6">
           <h1 className="text-2xl font-bold text-gray-100 mb-4">프로필</h1>
           
           <div className="space-y-4">
@@ -48,6 +48,7 @@ export default async function ProfilePage() {
                   ></div>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>
