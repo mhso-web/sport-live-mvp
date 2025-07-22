@@ -157,8 +157,8 @@ export class InquiryRepository implements IRepository<Inquiry> {
     })
   }
 
-  async delete(id: number): Promise<Inquiry> {
-    return prisma.inquiry.update({
+  async delete(id: number): Promise<void> {
+    await prisma.inquiry.update({
       where: { id },
       data: { isDeleted: true }
     })
