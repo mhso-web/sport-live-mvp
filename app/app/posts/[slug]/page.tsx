@@ -69,9 +69,37 @@ export default function BoardPostsPage() {
     }
   }, [category, page])
 
+  // 페이지 포커스 시 데이터 새로고침
+  useEffect(() => {
+    const handleFocus = () => {
+      if (category) {
+        fetchPosts()
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden && category) {
+        fetchPosts()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [category, page])
+
   const fetchCategory = async () => {
     try {
-      const response = await fetch(`/api/boards/${slug}`)
+      const response = await fetch(`/api/boards/${slug}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
       const data = await response.json()
       
       if (data.success) {
@@ -88,7 +116,12 @@ export default function BoardPostsPage() {
   const fetchPosts = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/posts?categorySlug=${slug}&page=${page}&limit=20`)
+      const response = await fetch(`/api/posts?categorySlug=${slug}&page=${page}&limit=20`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
       const data = await response.json()
       
       if (data.success) {

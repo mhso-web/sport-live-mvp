@@ -46,6 +46,27 @@ export default function PostsPage() {
     fetchBoardsWithPosts()
   }, [])
 
+  // 페이지 포커스 시 데이터 새로고침
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchBoardsWithPosts()
+    }
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchBoardsWithPosts()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
   const fetchBoardsWithPosts = async () => {
     try {
       setLoading(true)

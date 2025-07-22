@@ -84,9 +84,6 @@ export class PostService {
       throw new NotFoundException('게시글을 찾을 수 없습니다')
     }
 
-    // 조회수 증가 (비동기로 처리)
-    this.postRepository.incrementViews(id).catch(console.error)
-
     return new PostResponseDto(post)
   }
 
