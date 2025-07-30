@@ -99,6 +99,81 @@ async function main() {
       websiteUrl: 'https://aisports.example.com',
       bannerImage: '/images/partners/aisports.jpg',
       viewCount: 756
+    },
+    {
+      name: '스포츠 중계 플러스',
+      description: '고화질 스포츠 중계와 하이라이트 영상 제공',
+      detailContent: `
+# 스포츠 중계 플러스
+
+## 최고의 스포츠 중계 서비스
+
+### 🎥 서비스 특징
+- **4K 고화질** 실시간 중계
+- **다중 화면** 동시 시청 지원
+- **모든 디바이스** 호환
+- **광고 없는** 프리미엄 시청
+
+### 📺 중계 종목
+| 종목 | 리그 | 중계 수 |
+|------|------|---------|
+| 축구 | 프리미어리그, K리그 | 주 50경기 |
+| 야구 | KBO, MLB | 주 40경기 |
+| 농구 | KBL, NBA | 주 30경기 |
+| e스포츠 | LCK, VCT | 주 20경기 |
+
+### 💰 이용 요금
+- 기본: 월 9,900원
+- 프리미엄: 월 19,900원
+- VIP: 월 29,900원
+
+### 🎁 스포츠 라이브 회원 혜택
+**첫 달 50% 할인 + 3개월 이용 시 1개월 무료**
+      `,
+      websiteUrl: 'https://sportsplus.example.com',
+      bannerImage: '/images/partners/sportsplus.jpg',
+      viewCount: 1832
+    },
+    {
+      name: '챔피언 베팅',
+      description: '안전한 스포츠 베팅과 높은 배당률 제공',
+      detailContent: `
+# 챔피언 베팅
+
+## 🏆 승리를 위한 최고의 선택
+
+### 왜 챔피언 베팅인가?
+1. **업계 최고 배당률** - 타사 대비 5~10% 높은 배당
+2. **즉시 출금** - 당첨금 5분 내 출금 완료
+3. **안전 보장** - 100% 보증금 예치
+4. **24/7 고객지원** - 연중무휴 실시간 상담
+
+### 🎮 베팅 가능 종목
+- ⚽ 축구: 전 세계 200개 리그
+- ⚾ 야구: KBO, MLB, NPB
+- 🏀 농구: KBL, NBA, 유로리그
+- 🎯 e스포츠: LoL, 발로란트, 오버워치
+- 🎾 테니스, 골프, 배구 등
+
+### 💎 VIP 혜택
+- 베팅 한도 무제한
+- 전용 매니저 배정
+- 특별 보너스 지급
+- 프리미엄 분석 자료 제공
+
+### 🔒 안전성
+- 정식 라이선스 보유
+- SSL 암호화 적용
+- 개인정보 완벽 보호
+
+### 📞 고객센터
+- 카카오톡: @champion
+- 전화: 1566-7777
+- 이메일: help@champion.com
+      `,
+      websiteUrl: 'https://champion.example.com',
+      bannerImage: '/images/partners/champion.jpg',
+      viewCount: 2156
     }
   ]
 

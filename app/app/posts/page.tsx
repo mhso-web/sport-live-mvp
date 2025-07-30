@@ -48,7 +48,7 @@ async function getBoardsWithPosts() {
   for (const category of categories) {
     const result = await postRepo.findByFilters(
       { categorySlug: category.slug },
-      { limit: 6, orderBy: 'createdAt', order: 'desc' }
+      { limit: 10, orderBy: 'createdAt', order: 'desc' }
     )
     
     if (result.data.length > 0) {
@@ -74,7 +74,8 @@ async function getBoardsWithPosts() {
             comments: post._count.comments
           },
           createdAt: post.createdAt.toISOString()
-        }))
+        })),
+        totalCount: result.meta.total
       })
     }
   }
@@ -156,12 +157,12 @@ export default async function PostsPageSSR() {
                         </div>
                       </Link>
                     ))}
-                    {section.posts.length > 5 && (
+                    {section.totalCount > 5 && (
                       <Link
                         href={`/posts/${section.category.slug}`}
                         className="block px-6 py-3 text-center text-sm text-gold-500 hover:text-gold-400 hover:bg-dark-700/30 transition-colors"
                       >
-                        {section.posts.length - 5}개 게시글 더보기
+                        {section.totalCount - 5}개 게시글 더보기
                       </Link>
                     )}
                   </div>

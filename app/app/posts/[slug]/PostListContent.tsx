@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { useSession } from 'next-auth/react'
 import PostSearch from '@/components/posts/PostSearch'
+import Pagination from '@/components/ui/Pagination'
 
 interface Post {
   id: number
@@ -60,6 +61,7 @@ export default function PostListContent() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [meta, setMeta] = useState<PaginationMeta | null>(null)
+  const [itemsPerPage, setItemsPerPage] = useState(20)
 
   useEffect(() => {
     fetchCategory()
@@ -75,7 +77,7 @@ export default function PostListContent() {
     if (category) {
       fetchPosts()
     }
-  }, [category, page, searchQuery])
+  }, [category, page, searchQuery, itemsPerPage])
 
   // 페이지 포커스 시 데이터 새로고침
   useEffect(() => {
@@ -98,7 +100,7 @@ export default function PostListContent() {
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [category, page, searchQuery])
+  }, [category, page, searchQuery, itemsPerPage])
 
   const fetchCategory = async () => {
     try {
@@ -127,7 +129,7 @@ export default function PostListContent() {
       const params = new URLSearchParams({
         categorySlug: slug,
         page: page.toString(),
-        limit: '20'
+        limit: itemsPerPage.toString()
       })
 
       if (searchQuery) {
@@ -156,6 +158,14 @@ export default function PostListContent() {
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', newPage.toString())
+    router.push(`/posts/${slug}?${params.toString()}`)
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage)
+    // 페이지를 1로 리셋
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', '1')
     router.push(`/posts/${slug}?${params.toString()}`)
   }
 
@@ -285,44 +295,14 @@ export default function PostListContent() {
 
           {/* 페이지네이션 */}
           {meta && meta.totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-8">
-              <button
-                onClick={() => handlePageChange(page - 1)}
-                disabled={!meta.hasPrev}
-                className="px-3 py-1 rounded bg-dark-700 text-gray-300 hover:bg-dark-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                이전
-              </button>
-              
-              <div className="flex items-center space-x-1">
-                {Array.from({ length: Math.min(5, meta.totalPages) }, (_, i) => {
-                  const pageNum = Math.max(1, Math.min(page - 2 + i, meta.totalPages - 4)) + Math.min(i, Math.max(0, 2 - (page - 1)))
-                  if (pageNum > meta.totalPages) return null
-                  
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`px-3 py-1 rounded transition-colors ${
-                        pageNum === page
-                          ? 'bg-gold-600 text-white'
-                          : 'bg-dark-700 text-gray-300 hover:bg-dark-600'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                })}
-              </div>
-              
-              <button
-                onClick={() => handlePageChange(page + 1)}
-                disabled={!meta.hasNext}
-                className="px-3 py-1 rounded bg-dark-700 text-gray-300 hover:bg-dark-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                다음
-              </button>
-            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={meta.totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              showItemsPerPage={true}
+            />
           )}
         </>
       )}
