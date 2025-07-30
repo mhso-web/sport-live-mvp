@@ -64,11 +64,17 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token.id) {
+        // 최신 사용자 정보 가져오기
+        const user = await prisma.user.findUnique({
+          where: { id: parseInt(token.id as string) },
+          select: { level: true, experience: true }
+        })
+        
         session.user.id = token.id as string
         session.user.role = token.role as string
-        session.user.level = token.level as number
-        session.user.experience = token.experience as number
+        session.user.level = user?.level || token.level as number
+        session.user.experience = user?.experience || token.experience as number
       }
       return session
     }

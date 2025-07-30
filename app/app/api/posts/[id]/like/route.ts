@@ -35,6 +35,14 @@ export async function POST(
       )
     }
 
+    // Check if it's own post
+    if (post.userId === userId) {
+      return NextResponse.json(
+        { success: false, error: '자신의 게시글에는 좋아요를 할 수 없습니다' },
+        { status: 400 }
+      )
+    }
+
     // Check if already liked
     const existingLike = await prisma.postLike.findUnique({
       where: {
@@ -96,12 +104,20 @@ export async function POST(
         })
       }
 
+      // 최신 사용자 정보 가져오기
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { level: true, experience: true }
+      })
+
       return NextResponse.json({
         success: true,
         data: {
           liked: true,
           likesCount: post.likesCount + 1
-        }
+        },
+        userLevel: user?.level,
+        userExperience: user?.experience
       })
     }
   } catch (error) {

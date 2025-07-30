@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useState, useEffect, useRef } from 'react'
 import LevelProgressBar from '@/components/ui/LevelProgressBar'
+import { useUpdateSession } from '@/hooks/useUpdateSession'
 
 interface BoardCategory {
   id: number
@@ -15,6 +16,7 @@ interface BoardCategory {
 
 export default function Navigation() {
   const { data: session, status } = useSession()
+  const { updateUserLevel } = useUpdateSession()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [boardCategories, setBoardCategories] = useState<BoardCategory[]>([])
   const [isBoardMenuOpen, setIsBoardMenuOpen] = useState(false)
@@ -23,12 +25,17 @@ export default function Navigation() {
   useEffect(() => {
     fetchBoards()
     
+    // 컴포넌트 마운트 시 최신 세션 정보 가져오기
+    if (session?.user) {
+      updateUserLevel()
+    }
+    
     return () => {
       if (boardMenuTimeoutRef.current) {
         clearTimeout(boardMenuTimeoutRef.current)
       }
     }
-  }, [])
+  }, [session?.user?.id])
 
   const fetchBoards = async () => {
     try {
@@ -206,6 +213,15 @@ export default function Navigation() {
                       설정
                     </Link>
                     <hr className="my-1 border-dark-600" />
+                    <button
+                      onClick={() => {
+                        updateUserLevel()
+                        window.location.reload()
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-dark-600 hover:text-gold-500 transition-colors duration-200"
+                    >
+                      경험치 새로고침
+                    </button>
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-dark-600 hover:text-gold-500 transition-colors duration-200"

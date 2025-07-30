@@ -7,6 +7,7 @@ import { ko } from 'date-fns/locale'
 import Link from 'next/link'
 import CommentLikeButton from './CommentLikeButton'
 import { getLevelColorClass, getCommentCooldown } from '@/lib/utils/levelUtils'
+import { useUpdateSession } from '@/hooks/useUpdateSession'
 
 interface Comment {
   id: number
@@ -150,6 +151,7 @@ CommentItem.displayName = 'CommentItem'
 
 export default function CommentSection({ postId, comments: initialComments, commentCount }: CommentSectionProps) {
   const { data: session } = useSession()
+  const { updateUserLevel } = useUpdateSession()
   const [comments, setComments] = useState(initialComments)
   const [newComment, setNewComment] = useState('')
   const [replyTo, setReplyTo] = useState<number | null>(null)
@@ -210,6 +212,11 @@ export default function CommentSection({ postId, comments: initialComments, comm
         setComments([data.data, ...comments])
         setNewComment('')
         setLastCommentTime(Date.now()) // 마지막 댓글 시간 업데이트
+        
+        // 세션 업데이트
+        if (data.userLevel || data.userExperience) {
+          await updateUserLevel()
+        }
       }
     } catch (error) {
       console.error('Failed to post comment:', error)
@@ -265,6 +272,11 @@ export default function CommentSection({ postId, comments: initialComments, comm
         setReplyTo(null)
         setReplyContent('')
         setLastCommentTime(Date.now()) // 마지막 댓글 시간 업데이트
+        
+        // 세션 업데이트
+        if (data.userLevel || data.userExperience) {
+          await updateUserLevel()
+        }
       }
     } catch (error) {
       console.error('Failed to post reply:', error)

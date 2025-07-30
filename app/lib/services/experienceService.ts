@@ -106,6 +106,8 @@ export class ExperienceService {
     newLevel: number
     leveledUp: boolean
   }> {
+    console.log(`[ExperienceService] Awarding experience: userId=${userId}, action=${actionType}`)
+    
     const experienceGained = EXPERIENCE_TABLE[actionType] || 0
     
     if (experienceGained === 0) {
@@ -157,6 +159,22 @@ export class ExperienceService {
         leveledUp
       }
     })
+  }
+  
+  // 특정 게시글에 이미 댓글로 경험치를 받았는지 확인
+  static async hasReceivedCommentExperience(userId: number, postId: number): Promise<boolean> {
+    const existingLog = await prisma.userExperienceLog.findFirst({
+      where: {
+        userId,
+        actionType: 'COMMENT_CREATE',
+        metadata: {
+          path: ['postId'],
+          equals: postId
+        }
+      }
+    })
+    
+    return !!existingLog
   }
   
   // 일일 로그인 보상 체크 및 부여

@@ -58,17 +58,24 @@ export class PostService {
     })
 
     // 경험치 부여
-    await ExperienceService.awardExperience(auth.userId, 'POST_CREATE', {
-      postId: post.id,
-      boardType: post.boardType
-    })
-    
-    // 첫 게시글인지 확인
-    const postCount = await this.postRepository.countByUser(auth.userId)
-    if (postCount === 1) {
-      await ExperienceService.awardExperience(auth.userId, 'FIRST_POST', {
-        postId: post.id
+    try {
+      console.log(`[PostService] Awarding experience for post creation: userId=${auth.userId}`)
+      await ExperienceService.awardExperience(auth.userId, 'POST_CREATE', {
+        postId: post.id,
+        boardType: post.boardType
       })
+      
+      // 첫 게시글인지 확인
+      const postCount = await this.postRepository.countByUser(auth.userId)
+      console.log(`[PostService] User post count: ${postCount}`)
+      if (postCount === 1) {
+        await ExperienceService.awardExperience(auth.userId, 'FIRST_POST', {
+          postId: post.id
+        })
+      }
+    } catch (error) {
+      console.error('[PostService] Error awarding experience:', error)
+      // 경험치 부여 실패해도 게시글 작성은 성공
     }
 
     // 상세 정보 조회 후 반환

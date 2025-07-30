@@ -67,8 +67,13 @@ export async function POST(request: NextRequest) {
       userRole: session.user.role
     })
 
+    // 최신 사용자 정보 가져오기
+    const user = await userRepository.findById(parseInt(session.user.id))
+
     return NextResponse.json({
       data: post,
+      userLevel: user?.level || session.user.level,
+      userExperience: user?.experience || session.user.experience,
       success: true
     }, { status: 201 })
   } catch (error) {

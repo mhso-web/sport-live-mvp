@@ -71,10 +71,27 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // 경험치 부여
-    await ExperienceService.awardExperience(parseInt(session.user.id), 'COMMENT_CREATE', {
-      commentId: comment.id,
-      postId: validatedData.postId
+    // 경험치 부여 (같은 게시글에 처음 댓글 작성시에만)
+    const userId = parseInt(session.user.id)
+    const hasReceivedExp = await ExperienceService.hasReceivedCommentExperience(userId, validatedData.postId)
+    
+    // 자기 게시글이 아니고, 해당 게시글에 처음 댓글을 다는 경우에만 경험치 부여
+    const post = await prisma.post.findUnique({
+      where: { id: validatedData.postId },
+      select: { userId: true }
+    })
+    
+    if (!hasReceivedExp && post?.userId !== userId) {
+      await ExperienceService.awardExperience(userId, 'COMMENT_CREATE', {
+        commentId: comment.id,
+        postId: validatedData.postId
+      })
+    }
+
+    // 최신 사용자 정보 가져오기
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(session.user.id) },
+      select: { level: true, experience: true }
     })
 
     return NextResponse.json({
@@ -82,7 +99,9 @@ export async function POST(request: NextRequest) {
       data: {
         ...comment,
         replies: []
-      }
+      },
+      userLevel: user?.level || session.user.level,
+      userExperience: user?.experience || session.user.experience
     })
   } catch (error) {
     console.error('Error creating comment:', error)

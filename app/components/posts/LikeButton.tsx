@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { HeartIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
+import { useUpdateSession } from '@/hooks/useUpdateSession'
 
 interface LikeButtonProps {
   postId: number
@@ -14,6 +15,7 @@ interface LikeButtonProps {
 
 export default function LikeButton({ postId, initialLikesCount, size = 'md' }: LikeButtonProps) {
   const { data: session } = useSession()
+  const { updateUserLevel } = useUpdateSession()
   const router = useRouter()
   const [liked, setLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(initialLikesCount)
@@ -53,6 +55,11 @@ export default function LikeButton({ postId, initialLikesCount, size = 'md' }: L
       if (data.success) {
         setLiked(data.data.liked)
         setLikesCount(data.data.likesCount)
+        
+        // 세션 업데이트
+        if (data.userLevel || data.userExperience) {
+          await updateUserLevel()
+        }
       }
     } catch (error) {
       console.error('Failed to toggle like:', error)
