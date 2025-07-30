@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface BoardCategory {
   id: number
@@ -17,9 +17,16 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [boardCategories, setBoardCategories] = useState<BoardCategory[]>([])
   const [isBoardMenuOpen, setIsBoardMenuOpen] = useState(false)
+  const boardMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     fetchBoards()
+    
+    return () => {
+      if (boardMenuTimeoutRef.current) {
+        clearTimeout(boardMenuTimeoutRef.current)
+      }
+    }
   }, [])
 
   const fetchBoards = async () => {
@@ -66,8 +73,17 @@ export default function Navigation() {
               {/* 게시판 드롭다운 */}
               <div 
                 className="relative inline-flex items-center"
-                onMouseEnter={() => setIsBoardMenuOpen(true)}
-                onMouseLeave={() => setIsBoardMenuOpen(false)}
+                onMouseEnter={() => {
+                  if (boardMenuTimeoutRef.current) {
+                    clearTimeout(boardMenuTimeoutRef.current)
+                  }
+                  setIsBoardMenuOpen(true)
+                }}
+                onMouseLeave={() => {
+                  boardMenuTimeoutRef.current = setTimeout(() => {
+                    setIsBoardMenuOpen(false)
+                  }, 100)
+                }}
               >
                 <Link
                   href="/posts"
@@ -80,8 +96,9 @@ export default function Navigation() {
                 </Link>
                 
                 {isBoardMenuOpen && boardCategories.length > 0 && (
-                  <div className="absolute left-0 top-full mt-1 w-64 bg-dark-700 border border-dark-600 rounded-md shadow-xl z-50">
-                    <div className="py-2">
+                  <div className="absolute left-0 top-full pt-2 w-64 z-50">
+                    <div className="bg-dark-700 border border-dark-600 rounded-md shadow-xl">
+                      <div className="py-2">
                       {boardCategories.map((category) => (
                         <Link
                           key={category.id}
@@ -105,6 +122,7 @@ export default function Navigation() {
                         <span className="mr-3 text-lg w-6 h-6 flex items-center justify-center">📋</span>
                         <span>전체 게시판</span>
                       </Link>
+                      </div>
                     </div>
                   </div>
                 )}

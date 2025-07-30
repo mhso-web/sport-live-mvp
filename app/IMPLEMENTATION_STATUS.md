@@ -79,22 +79,25 @@
 - [x] 댓글 입력 포커스 문제 해결 (React.memo)
 - [x] 게시판 데이터 실시간 갱신
 - [x] API 라우트 및 서버 컴포넌트 동적 렌더링 설정
+- [x] 코딩 가이드라인 문서 작성 (CODING_GUIDELINES.md)
+
+### 10. 게시판 추가 기능 구현 (2025-07-22)
+- [x] 좋아요 기능 구현 (게시글 및 댓글)
+  - [x] PostLike API 엔드포인트 (/api/posts/[id]/like)
+  - [x] CommentLike 모델 생성 및 마이그레이션
+  - [x] CommentLike API 엔드포인트 (/api/comments/[id]/like)
+  - [x] LikeButton 컴포넌트 (게시글용)
+  - [x] CommentLikeButton 컴포넌트 (댓글용)
+- [x] 게시글 검색 기능
+  - [x] PostSearch 컴포넌트 구현
+  - [x] 제목 및 내용 검색 (대소문자 구분 없음)
+  - [x] 게시판별 검색 지원
+  - [x] 검색 결과 개수 표시
+  - [x] 검색어 초기화 기능
 
 ## 예정된 작업 📋
 
 ### 1. 게시판 추가 기능
-- [ ] 좋아요 기능 구현 (게시글 및 댓글)
-  - [ ] PostLike API 엔드포인트 (/api/posts/[id]/like)
-  - [ ] CommentLike 모델 생성 및 마이그레이션
-  - [ ] CommentLike API 엔드포인트 (/api/comments/[id]/like)
-  - [ ] LikeButton 컴포넌트 (게시글용)
-  - [ ] CommentLikeButton 컴포넌트 (댓글용)
-- [ ] 게시글 검색 기능
-  - [ ] PostSearch 컴포넌트 구현
-  - [ ] 제목 및 내용 검색 (대소문자 구분 없음)
-  - [ ] 게시판별 검색 지원
-  - [ ] 검색 결과 개수 표시
-  - [ ] 검색어 초기화 기능
 - [ ] 페이지네이션 개선
 
 ### 2. 보증업체 추가 기능
