@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth.config'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { ExperienceService } from '@/lib/services/experienceService'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,6 +69,12 @@ export async function POST(request: NextRequest) {
           increment: 1
         }
       }
+    })
+
+    // 경험치 부여
+    await ExperienceService.awardExperience(parseInt(session.user.id), 'COMMENT_CREATE', {
+      commentId: comment.id,
+      postId: validatedData.postId
     })
 
     return NextResponse.json({

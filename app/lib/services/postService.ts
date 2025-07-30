@@ -12,6 +12,7 @@ import {
   ForbiddenException, 
   ValidationError 
 } from '@/lib/errors'
+import { ExperienceService } from './experienceService'
 
 interface AuthenticatedRequest {
   userId: number
@@ -56,8 +57,11 @@ export class PostService {
       })
     })
 
-    // 경험치 부여 (10 XP)
-    await this.awardExperience(auth.userId, 10, 'POST_CREATE')
+    // 경험치 부여
+    await ExperienceService.awardExperience(auth.userId, 'POST_CREATE', {
+      postId: post.id,
+      boardType: post.boardType
+    })
 
     // 상세 정보 조회 후 반환
     const postWithRelations = await this.postRepository.findWithRelations(post.id)
@@ -154,13 +158,4 @@ export class PostService {
     })
   }
 
-  private async awardExperience(userId: number, amount: number, action: string) {
-    // 경험치 로그 추가 (나중에 구현)
-    await this.userRepository.update(userId, {
-      experience: { increment: amount }
-    })
-
-    // 레벨 계산 및 업데이트 (나중에 구현)
-    // TODO: 레벨 시스템 구현
-  }
 }

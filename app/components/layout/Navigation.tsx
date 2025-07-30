@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useState, useEffect, useRef } from 'react'
+import LevelProgressBar from '@/components/ui/LevelProgressBar'
 
 interface BoardCategory {
   id: number
@@ -182,7 +183,14 @@ export default function Navigation() {
                 </button>
                 
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-dark-700 border border-dark-600 rounded-md shadow-xl py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-64 bg-dark-700 border border-dark-600 rounded-md shadow-xl py-1 z-50">
+                    <div className="px-4 py-2 border-b border-dark-600">
+                      <LevelProgressBar 
+                        userId={parseInt(session.user.id)}
+                        currentLevel={session.user.level}
+                        currentExperience={session.user.experience || 0}
+                      />
+                    </div>
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-600 hover:text-gold-500 transition-colors duration-200"

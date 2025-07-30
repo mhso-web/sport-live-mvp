@@ -2,6 +2,8 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { authService } from '@/lib/container'
 import { config } from '@/lib/config'
+import { ExperienceService } from '@/lib/services/experienceService'
+import { prisma } from '@/lib/prisma'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -37,6 +39,21 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
+    async signIn({ user }) {
+      if (user?.id) {
+        const userId = parseInt(user.id)
+        
+        // 마지막 로그인 시간 업데이트
+        await prisma.user.update({
+          where: { id: userId },
+          data: { lastLoginAt: new Date() }
+        })
+        
+        // 일일 로그인 보상 체크 및 부여
+        await ExperienceService.checkDailyLogin(userId)
+      }
+      return true
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id

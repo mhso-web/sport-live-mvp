@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth.config'
 import { PostRepository } from '@/lib/repositories/postRepository'
 import { prisma } from '@/lib/prisma'
+import { ExperienceService } from '@/lib/services/experienceService'
 
 export const dynamic = 'force-dynamic'
 
@@ -79,6 +80,21 @@ export async function POST(
         where: { id: postId },
         data: { likesCount: { increment: 1 } }
       })
+
+      // 경험치 부여
+      // 좋아요를 누른 사람에게
+      await ExperienceService.awardExperience(userId, 'POST_LIKE', {
+        postId,
+        authorId: post.userId
+      })
+      
+      // 좋아요를 받은 사람에게 (본인 게시글이 아닌 경우)
+      if (post.userId !== userId) {
+        await ExperienceService.awardExperience(post.userId, 'RECEIVED_LIKE', {
+          postId,
+          likedByUserId: userId
+        })
+      }
 
       return NextResponse.json({
         success: true,
