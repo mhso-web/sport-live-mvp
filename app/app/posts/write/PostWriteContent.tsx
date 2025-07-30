@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useUpdateSession } from '@/hooks/useUpdateSession'
 
 interface BoardCategory {
   id: number
@@ -16,6 +17,7 @@ export default function PostWriteContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session, status } = useSession()
+  const { updateUserLevel } = useUpdateSession()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [categoryId, setCategoryId] = useState<number | null>(null)
@@ -122,6 +124,9 @@ export default function PostWriteContent() {
       const data = await response.json()
 
       if (response.ok && data.success) {
+        // 세션 레벨 업데이트
+        await updateUserLevel()
+        
         // 작성한 게시글로 이동
         router.push(`/posts/${selectedCategory?.slug}/${data.data.id}`)
         router.refresh()

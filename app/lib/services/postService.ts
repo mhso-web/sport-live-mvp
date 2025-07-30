@@ -62,6 +62,14 @@ export class PostService {
       postId: post.id,
       boardType: post.boardType
     })
+    
+    // 첫 게시글인지 확인
+    const postCount = await this.postRepository.countByUser(auth.userId)
+    if (postCount === 1) {
+      await ExperienceService.awardExperience(auth.userId, 'FIRST_POST', {
+        postId: post.id
+      })
+    }
 
     // 상세 정보 조회 후 반환
     const postWithRelations = await this.postRepository.findWithRelations(post.id)

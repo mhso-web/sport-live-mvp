@@ -215,6 +215,15 @@ export class PostRepository implements IPostRepository {
       }
     })
   }
+  
+  async countByUser(userId: number): Promise<number> {
+    return prisma.post.count({
+      where: {
+        userId,
+        isDeleted: false
+      }
+    })
+  }
 
   async updateCounts(id: number): Promise<void> {
     const counts = await prisma.post.findUnique({
