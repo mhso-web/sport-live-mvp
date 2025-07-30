@@ -8,6 +8,7 @@ import { ko } from 'date-fns/locale'
 import PostViewCounter from '@/components/posts/PostViewCounter'
 import PostActions from '@/components/posts/PostActions'
 import CommentSection from '@/components/posts/CommentSection'
+import LikeButton from '@/components/posts/LikeButton'
 
 interface Props {
   params: {
@@ -205,13 +206,11 @@ export default async function PostDetailPage({ params }: Props) {
 
               {/* 좋아요 버튼 */}
               <div className="mt-8 pt-6 border-t border-dark-700 flex justify-center">
-                <button className="flex items-center space-x-2 px-6 py-3 bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-gold-500 rounded-lg transition-all duration-200">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                  <span>좋아요</span>
-                  <span className="font-medium">{post._count.likes}</span>
-                </button>
+                <LikeButton 
+                  postId={post.id} 
+                  initialLikesCount={post.likesCount} 
+                  size="lg"
+                />
               </div>
             </div>
           </div>

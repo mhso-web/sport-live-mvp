@@ -5,11 +5,13 @@ import { useSession } from 'next-auth/react'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import Link from 'next/link'
+import CommentLikeButton from './CommentLikeButton'
 
 interface Comment {
   id: number
   content: string
   createdAt: Date
+  likesCount: number
   user: {
     id: number
     username: string
@@ -65,16 +67,22 @@ const CommentItem = memo(({
                 {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ko })}
               </span>
             </div>
+          </div>
+          <p className="text-gray-300 mb-2">{comment.content}</p>
+          <div className="flex items-center space-x-4">
+            <CommentLikeButton 
+              commentId={comment.id} 
+              initialLikesCount={comment.likesCount} 
+            />
             {!isReply && (
               <button
                 onClick={() => onReplyClick(comment.id)}
                 className="text-xs text-gray-400 hover:text-gold-500 transition-colors"
               >
-                답글
+                답글 달기
               </button>
             )}
           </div>
-          <p className="text-gray-300">{comment.content}</p>
         </div>
 
         {/* 답글 작성 폼 */}

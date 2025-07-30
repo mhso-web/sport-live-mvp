@@ -335,4 +335,68 @@ throw new ForbiddenException('권한이 없습니다')
    })
    ```
 
+5. **서버 컴포넌트**: 동적 렌더링 설정 필수
+   ```typescript
+   // 데이터베이스 접근이 있는 서버 컴포넌트
+   export const dynamic = 'force-dynamic'  // ✅ 필수!
+   
+   export default async function Page() {
+     const data = await prisma.post.findMany()
+     // ...
+   }
+   ```
+
+## Vercel 배포 시 주의사항
+
+1. **빌드 에러 예방**:
+   - 로컬에서 `npm run build` 테스트 필수
+   - TypeScript 타입 체크 통과 확인
+   - 모든 import 경로 검증
+
+2. **동적 렌더링 설정**:
+   - 서버 컴포넌트에서 DB 접근 시 `export const dynamic = 'force-dynamic'` 필수
+   - API 라우트는 항상 동적이어야 함
+
+3. **환경 변수**:
+   - `.env` (로컬) vs `.env.production` (Vercel)
+   - DATABASE_URL은 Vercel 환경 변수에 설정
+
+## 트러블슈팅
+
+### 문제: Vercel에서 404 에러
+```typescript
+// 해결: 서버 컴포넌트에 dynamic export 추가
+export const dynamic = 'force-dynamic'
+```
+
+### 문제: Module not found 에러
+```typescript
+// 해결: 올바른 import 경로 사용
+import { prisma } from '@/lib/prisma'  // ✅
+import { PostRepository } from '@/lib/repositories/postRepository'  // ✅
+```
+
+### 문제: 타입 에러
+```typescript
+// 해결: session.user.id 타입 변환
+const userId = parseInt(session.user.id)  // string → number
+```
+
+## 향후 개발 시 체크리스트
+
+### 새 기능 개발 전
+- [ ] 기존 유사 기능 코드 분석
+- [ ] CODING_GUIDELINES.md 확인
+- [ ] 필요한 모델/타입 정의
+
+### 개발 중
+- [ ] Repository/Service 패턴 일관성 유지
+- [ ] API 응답 형식 통일
+- [ ] 에러 처리 구현
+
+### 개발 후
+- [ ] `npm run build` 로컬 테스트
+- [ ] `npm run type-check` 타입 체크
+- [ ] Vercel 배포 후 기능 테스트
+
 이 가이드라인을 따르면 일관성 있고 유지보수가 쉬운 코드를 작성할 수 있습니다.

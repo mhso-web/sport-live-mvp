@@ -30,6 +30,7 @@ model User {
   badges          UserBadge[]
   experienceLogs  UserExperienceLog[]
   postLikes       PostLike[]
+  commentLikes    CommentLike[]
   analysisFeedback AnalysisFeedback[]
   chatMessages    ChatMessage[]
   
@@ -162,6 +163,7 @@ model Comment {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies     Comment[] @relation("CommentReplies")
+  likes       CommentLike[]
   
   @@index([postId])
   @@index([userId])
@@ -182,6 +184,20 @@ model PostLike {
   @@unique([postId, userId])
   @@index([userId])
   @@map("post_likes")
+}
+
+model CommentLike {
+  id        Int      @id @default(autoincrement())
+  commentId Int      @map("comment_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([commentId, userId])
+  @@index([userId])
+  @@map("comment_likes")
 }
 
 model Match {
