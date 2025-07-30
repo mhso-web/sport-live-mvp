@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import Link from 'next/link'
 import CommentLikeButton from './CommentLikeButton'
+import { getLevelColorClass, getCommentCooldown } from '@/lib/utils/levelUtils'
 
 interface Comment {
   id: number
@@ -59,7 +60,7 @@ const CommentItem = memo(({
         <div className="bg-dark-700/50 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
-              <span className="font-medium text-gray-100">{comment.user.username}</span>
+              <span className={`font-medium ${getLevelColorClass(comment.user.level)}`}>{comment.user.username}</span>
               <span className="text-xs bg-gold-900/30 text-gold-400 px-2 py-0.5 rounded">
                 Lv.{comment.user.level}
               </span>
@@ -154,10 +155,44 @@ export default function CommentSection({ postId, comments: initialComments, comm
   const [replyTo, setReplyTo] = useState<number | null>(null)
   const [replyContent, setReplyContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [lastCommentTime, setLastCommentTime] = useState(0)
+  const [cooldownRemaining, setCooldownRemaining] = useState(0)
+
+  // 댓글 쿨타임 체크
+  const checkCooldown = useCallback(() => {
+    if (!session) return true
+    
+    const now = Date.now()
+    const cooldown = getCommentCooldown(session.user.level) * 1000 // 초를 밀리초로 변환
+    const timeSinceLastComment = now - lastCommentTime
+    
+    if (timeSinceLastComment < cooldown) {
+      const remaining = Math.ceil((cooldown - timeSinceLastComment) / 1000)
+      setCooldownRemaining(remaining)
+      
+      // 카운트다운 시작
+      const timer = setInterval(() => {
+        setCooldownRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+      
+      return false
+    }
+    
+    return true
+  }, [session, lastCommentTime])
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!session || !newComment.trim() || isSubmitting) return
+    
+    // 쿨타임 체크
+    if (!checkCooldown()) return
 
     setIsSubmitting(true)
     try {
@@ -174,6 +209,7 @@ export default function CommentSection({ postId, comments: initialComments, comm
         const data = await response.json()
         setComments([data.data, ...comments])
         setNewComment('')
+        setLastCommentTime(Date.now()) // 마지막 댓글 시간 업데이트
       }
     } catch (error) {
       console.error('Failed to post comment:', error)
@@ -198,6 +234,9 @@ export default function CommentSection({ postId, comments: initialComments, comm
 
   const handleSubmitReply = useCallback(async (parentId: number) => {
     if (!session || !replyContent.trim() || isSubmitting) return
+    
+    // 쿨타임 체크
+    if (!checkCooldown()) return
 
     setIsSubmitting(true)
     try {
@@ -225,13 +264,14 @@ export default function CommentSection({ postId, comments: initialComments, comm
         }))
         setReplyTo(null)
         setReplyContent('')
+        setLastCommentTime(Date.now()) // 마지막 댓글 시간 업데이트
       }
     } catch (error) {
       console.error('Failed to post reply:', error)
     } finally {
       setIsSubmitting(false)
     }
-  }, [session, replyContent, isSubmitting, postId, comments])
+  }, [session, replyContent, isSubmitting, postId, comments, checkCooldown])
 
   return (
     <div className="mt-8">
@@ -254,10 +294,14 @@ export default function CommentSection({ postId, comments: initialComments, comm
             <div className="mt-3 flex justify-end">
               <button
                 type="submit"
-                disabled={isSubmitting || !newComment.trim()}
+                disabled={isSubmitting || !newComment.trim() || cooldownRemaining > 0}
                 className="px-6 py-2 bg-gold-600 hover:bg-gold-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? '등록 중...' : '댓글 등록'}
+                {cooldownRemaining > 0 
+                  ? `${cooldownRemaining}초 후 작성 가능` 
+                  : isSubmitting 
+                    ? '등록 중...' 
+                    : '댓글 등록'}
               </button>
             </div>
           </div>

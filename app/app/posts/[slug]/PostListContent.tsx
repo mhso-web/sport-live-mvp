@@ -8,6 +8,7 @@ import { ko } from 'date-fns/locale'
 import { useSession } from 'next-auth/react'
 import PostSearch from '@/components/posts/PostSearch'
 import Pagination from '@/components/ui/Pagination'
+import { getLevelColorClass, getPostBorderClass } from '@/lib/utils/levelUtils'
 
 interface Post {
   id: number
@@ -240,7 +241,7 @@ export default function PostListContent() {
                 <Link
                   key={post.id}
                   href={`/posts/${slug}/${post.id}`}
-                  className="block px-6 py-4 hover:bg-dark-700/50 transition-colors"
+                  className={`block px-6 py-4 hover:bg-dark-700/50 transition-colors ${getPostBorderClass(post.author.level)}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -263,7 +264,7 @@ export default function PostListContent() {
                       
                       <div className="flex items-center space-x-4 mt-3 text-xs text-gray-500">
                         <span className="flex items-center space-x-1">
-                          <span>{post.author.username}</span>
+                          <span className={`font-medium ${getLevelColorClass(post.author.level)}`}>{post.author.username}</span>
                           <span className="text-gold-500">Lv.{post.author.level}</span>
                         </span>
                         <span>•</span>

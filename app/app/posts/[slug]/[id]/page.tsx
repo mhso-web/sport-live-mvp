@@ -9,6 +9,8 @@ import PostViewCounter from '@/components/posts/PostViewCounter'
 import PostActions from '@/components/posts/PostActions'
 import CommentSection from '@/components/posts/CommentSection'
 import LikeButton from '@/components/posts/LikeButton'
+import UserBadge from '@/components/ui/UserBadge'
+import { getLevelColorClass } from '@/lib/utils/levelUtils'
 
 interface Props {
   params: {
@@ -167,10 +169,11 @@ export default async function PostDetailPage({ params }: Props) {
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="font-medium text-gray-100">{post.user.username}</span>
+                      <span className={`font-medium ${getLevelColorClass(post.user.level)}`}>{post.user.username}</span>
                       <span className="text-xs bg-gold-900/30 text-gold-400 px-2 py-0.5 rounded">
                         Lv.{post.user.level}
                       </span>
+                      <UserBadge level={post.user.level} size="sm" />
                       {post.user.role === 'ADMIN' && (
                         <span className="text-xs bg-red-900/30 text-red-400 px-2 py-0.5 rounded">
                           관리자
