@@ -146,6 +146,7 @@
   - [x] 활동 통계 (게시글/댓글 수, 받은 좋아요, 총 조회수)
   - [x] 최근 게시글/댓글 표시
   - [x] 레벨별 색상 및 뱃지 표시
+  - [x] 자기소개(bio) 표시 추가
 - [x] 프로필 수정 기능
   - [x] 닉네임 변경 (중복 검사)
   - [x] 자기소개(bio) 수정
@@ -159,21 +160,84 @@
   - [x] GET/PUT /api/users/[id]
   - [x] PUT /api/users/[id]/password
 
+### 16. 유저 뱃지 시스템 구현 (2025-07-31)
+- [x] UserBadge 모델 (이미 존재)
+- [x] BadgeService 구현
+  - [x] 뱃지 종류 정의 (레벨, 활동, 특별 뱃지)
+  - [x] 뱃지 획득 조건 체크 로직
+  - [x] 뱃지 부여 메소드
+- [x] 뱃지 자동 획득 시스템
+  - [x] 레벨업 시 레벨 뱃지 자동 부여
+  - [x] 게시글/댓글 작성 수 기반 뱃지
+  - [x] 받은 좋아요 수 기반 뱃지
+- [x] UI 컴포넌트
+  - [x] 프로필 페이지에 뱃지 표시
+  - [x] 뱃지 툴팁으로 설명 표시
+  - [x] 뱃지 아이콘 및 색상 디자인
+
+### 17. 경험치 획득 내역 페이지 구현 (2025-07-31)
+- [x] 경험치 로그 페이지 (/profile/experience-logs)
+  - [x] 월별 경험치 획득 차트 (Chart.js)
+  - [x] 최근 30일 일별 획득량 그래프
+  - [x] 행동별 경험치 통계 (파이 차트)
+  - [x] 경험치 획득 히스토리 (페이지네이션)
+- [x] API 엔드포인트
+  - [x] GET /api/users/[id]/experience-logs
+  - [x] 월별/일별/행동별 통계 집계
+- [x] UI 디자인
+  - [x] 차트 다크테마 적용
+  - [x] 반응형 레이아웃
+  - [x] 애니메이션 효과
+
+### 18. 보증업체 활동 내역 추가 (2025-07-31)
+- [x] 내 활동 내역에 보증업체 탭 추가
+  - [x] 좋아요한 보증업체 목록
+  - [x] 댓글 단 보증업체 목록
+  - [x] 별점 평가한 보증업체 목록
+- [x] Repository 메소드 추가
+  - [x] getUserPartnerLikes
+  - [x] getUserPartnerComments
+  - [x] getUserPartnerRatings
+- [x] UI 구현
+  - [x] 보증업체 카드 컴포넌트
+  - [x] 활동 날짜 표시
+  - [x] 페이지네이션 지원
+
+### 19. Vercel 배포 이슈 해결 (2025-07-31)
+- [x] 클라이언트 사이드 라우팅 문제 해결
+  - [x] middleware.ts 설정 수정 (인증 필요한 라우트만 보호)
+  - [x] Navigation 컴포넌트 API 실패 시 fallback 데이터 사용
+  - [x] LoginForm window.location.href 리다이렉트 방식으로 변경
+- [x] 동적 라우팅 404 에러 해결
+  - [x] generateStaticParams 추가 (게시판 카테고리)
+  - [x] force-dynamic export 추가
+  - [x] PostListContent 컴포넌트 fallback 카테고리 추가
+- [x] NextAuth API 라우트 404 에러 해결
+  - [x] 잘못된 위치의 /api 폴더 삭제 (루트에 있던 것)
+  - [x] next.config.js NEXTAUTH_URL 환경 변수 로직 수정
+  - [x] .gitignore 업데이트 (환경 파일 보호)
+- [x] 데이터베이스 관련 오류 해결
+  - [x] comment_likes 테이블 마이그레이션 생성
+  - [x] package.json에 db:migrate:deploy 스크립트 추가
+  - [x] 데이터베이스 연결 수 제한 문제 해결
+  - [x] prismaEdge 유틸리티 생성 (Edge Runtime 지원)
+  - [x] Vercel 배포 가이드 문서 업데이트
+
 ## 예정된 작업 📋
 
 ### 1. 사용자 프로필 추가 기능 (우선순위: 높음)
 - [ ] 프로필 페이지 개선
+  - [x] 자기소개(bio) 표시 (완료)
   - [ ] 프로필 이미지 표시
-  - [ ] 자기소개(bio) 표시
   - [ ] 프로필 조회수 카운터
-- [ ] 유저 뱃지 시스템
-  - [ ] 뱃지 획득 로직 구현
-  - [ ] 프로필에 뱃지 표시
-  - [ ] 뱃지별 획득 조건 정의
-- [ ] 경험치 획득 내역
-  - [ ] 경험치 로그 페이지
-  - [ ] 일별/주별/월별 통계
-  - [ ] 경험치 획득 히스토리 차트
+- [x] 유저 뱃지 시스템 (완료)
+  - [x] 뱃지 획득 로직 구현
+  - [x] 프로필에 뱃지 표시
+  - [x] 뱃지별 획득 조건 정의
+- [x] 경험치 획득 내역 (완료)
+  - [x] 경험치 로그 페이지
+  - [x] 일별/주별/월별 통계
+  - [x] 경험치 획득 히스토리 차트
 - [ ] 좋아요 목록
   - [ ] 좋아요 준 게시글 목록
   - [ ] 좋아요 준 댓글 목록
@@ -347,4 +411,41 @@ export const dynamic = 'force-dynamic'
 - Prisma 연결 풀 설정 조정
 - `connection_limit` 파라미터 추가
 - Production 환경에서도 싱글톤 패턴 강화
+
+### Vercel 배포 환경 문제 종합 해결 (2025-07-31)
+
+**문제 1**: 로그인 버튼 클릭 시 무반응, 게시판 메뉴 이동 불가
+
+**원인**: 
+- 미들웨어가 모든 라우트를 차단
+- Navigation 컴포넌트의 API 호출 실패 처리 미흡
+
+**해결**:
+1. 미들웨어 matcher 수정 - 인증이 필요한 라우트만 보호
+2. Navigation 컴포넌트에 fallback 카테고리 추가
+3. LoginForm에서 router.push 대신 window.location.href 사용
+
+**문제 2**: NextAuth API 라우트 404 에러 (/api/auth/session)
+
+**원인**: 
+- 프로젝트 루트에 잘못된 /api 폴더 존재 (중복)
+- 올바른 위치는 /app/api
+
+**해결**:
+1. 루트의 /api 폴더 삭제
+2. next.config.js의 NEXTAUTH_URL 환경 변수 로직 수정
+
+**문제 3**: 데이터베이스 연결 수 초과 (too many connections)
+
+**원인**: 서버리스 환경에서 연결이 제대로 해제되지 않음
+
+**해결**:
+1. `prisma.ts`에 process.on('beforeExit') 핸들러 추가
+2. Edge Runtime용 `prismaEdge.ts` 유틸리티 생성
+3. DATABASE_URL에 `?connection_limit=5` 파라미터 추가 권장
+
+**문서화**:
+- `/docs/VERCEL_DEPLOYMENT.md` 생성
+- 데이터베이스 연결 최적화 가이드 추가
+- 환경 변수 설정 방법 상세 설명
 
