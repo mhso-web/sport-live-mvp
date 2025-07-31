@@ -238,7 +238,7 @@ export class PartnerRepository implements IRepository<Partner> {
     }))
   }
 
-  async count(): Promise<number> {
-    return prisma.partner.count()
+  async count(args?: { where?: Prisma.PartnerWhereInput }): Promise<number> {
+    return prisma.partner.count(args)
   }
 }
