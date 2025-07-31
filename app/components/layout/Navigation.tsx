@@ -231,6 +231,18 @@ export default function Navigation() {
                       설정
                     </Link>
                     <hr className="my-1 border-dark-600" />
+                    {['ADMIN', 'SUB_ADMIN'].includes(session.user.role) && (
+                      <>
+                        <Link
+                          href="/admin"
+                          className="block px-4 py-2 text-sm text-gold-400 hover:bg-dark-600 hover:text-gold-500 transition-colors duration-200"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          관리자 패널
+                        </Link>
+                        <hr className="my-1 border-dark-600" />
+                      </>
+                    )}
                     <button
                       onClick={() => {
                         updateUserLevel()
@@ -385,6 +397,15 @@ export default function Navigation() {
                   >
                     설정
                   </Link>
+                  {['ADMIN', 'SUB_ADMIN'].includes(session.user.role) && (
+                    <Link
+                      href="/admin"
+                      className="block px-4 py-2 text-base font-medium text-gold-400 hover:text-gold-500 hover:bg-dark-700 transition-colors duration-200"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      관리자 패널
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-dark-700 transition-colors duration-200"

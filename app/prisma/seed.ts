@@ -95,7 +95,7 @@ async function main() {
     create: {
       username: 'admin',
       email: adminEmail,
-      passwordHash: '$2a$10$XQq9pEJmRQVxWJYaRnFgE.h0HMFgLrCVCIUaVZTwU0SyepIxurcR2', // password: admin123
+      passwordHash: '$2b$10$7KucedMEC/nUZQc.snMDbuIZcYQoI.LYhJBX3Itwi/OPhzbEaaqjW', // password: admin123
       role: 'ADMIN',
       level: 99,
       experience: 999999

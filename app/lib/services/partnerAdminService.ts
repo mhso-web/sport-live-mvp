@@ -56,15 +56,17 @@ export class PartnerAdminService {
       }
     }
 
-    // 정렬 옵션 설정
-    let orderBy: Prisma.PartnerOrderByWithRelationInput = { createdAt: 'desc' }
-    if (filters.sortBy === 'name') {
-      orderBy = { name: 'asc' }
+    // PartnerFilters에 맞게 필터 변환
+    // name 정렬은 latest로 처리하고, 필요시 클라이언트에서 정렬
+    const partnerFilters = {
+      search: filters.search,
+      isActive: filters.isActive,
+      sortBy: filters.sortBy === 'name' ? undefined : filters.sortBy
     }
-
+    
     return this.partnerRepository.findByFilters(
-      filters,
-      { page, limit, orderBy: 'createdAt', order: 'desc' }
+      partnerFilters,
+      { page, limit }
     )
   }
 
@@ -74,7 +76,9 @@ export class PartnerAdminService {
     
     return this.partnerRepository.create({
       ...validated,
-      createdBy
+      creator: {
+        connect: { id: createdBy }
+      }
     })
   }
 
