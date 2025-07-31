@@ -20,6 +20,25 @@ Vercel Dashboard > Settings > Environment Variables에서 다음 환경 변수�
 1. **API 라우트 구조**: 모든 API 라우트는 `/app/api` 폴더 안에 있어야 합니다
 2. **환경 변수**: `.env.production.local` 파일은 Vercel에서 읽지 않습니다. 반드시 Vercel Dashboard에서 설정하세요
 3. **NEXTAUTH_URL**: 설정하지 않으면 자동으로 VERCEL_URL을 사용합니다
+4. **데이터베이스 연결**: Vercel 서버리스 환경에서는 연결 풀 관리가 중요합니다
+
+## 데이터베이스 연결 최적화
+
+### 연결 수 제한 문제 해결
+"too many connections" 오류가 발생하는 경우:
+
+1. **Prisma Accelerate 사용 (권장)**
+   - Vercel Dashboard에서 Prisma Accelerate 활성화
+   - 자동 연결 풀링 제공
+
+2. **연결 수 제한 설정**
+   ```
+   DATABASE_URL="postgresql://...?connection_limit=5"
+   ```
+
+3. **PgBouncer 사용**
+   - 데이터베이스 앞에 연결 풀러 설치
+   - Supabase, Neon 등은 기본 제공
 
 ## 환경 변수 설정 방법
 
