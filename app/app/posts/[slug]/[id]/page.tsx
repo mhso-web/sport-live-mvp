@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import Navigation from '@/components/layout/Navigation'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatDistanceToNow } from 'date-fns'
@@ -11,6 +10,7 @@ import CommentSection from '@/components/posts/CommentSection'
 import LikeButton from '@/components/posts/LikeButton'
 import UserBadge from '@/components/ui/UserBadge'
 import { getLevelColorClass } from '@/lib/utils/levelUtils'
+import type { Prisma } from '@prisma/client'
 
 interface Props {
   params: {
@@ -18,6 +18,50 @@ interface Props {
     id: string
   }
 }
+
+type PostWithRelations = Prisma.PostGetPayload<{
+  include: {
+    user: {
+      select: {
+        id: true
+        username: true
+        level: true
+        role: true
+      }
+    }
+    category: true
+    comments: {
+      where: { isDeleted: false; parentId: null }
+      include: {
+        user: {
+          select: {
+            id: true
+            username: true
+            level: true
+          }
+        }
+        replies: {
+          where: { isDeleted: false }
+          include: {
+            user: {
+              select: {
+                id: true
+                username: true
+                level: true
+              }
+            }
+          }
+        }
+      }
+    }
+    _count: {
+      select: {
+        comments: { where: { isDeleted: false } }
+        likes: true
+      }
+    }
+  }
+}>
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPost(parseInt(params.id))
@@ -36,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-async function getPost(id: number) {
+async function getPost(id: number): Promise<PostWithRelations | null> {
   const post = await prisma.post.findUnique({
     where: { 
       id,
@@ -47,7 +91,6 @@ async function getPost(id: number) {
         select: {
           id: true,
           username: true,
-          profileImage: true,
           level: true,
           role: true
         }
@@ -63,7 +106,6 @@ async function getPost(id: number) {
             select: {
               id: true,
               username: true,
-              profileImage: true,
               level: true
             }
           },
@@ -74,7 +116,6 @@ async function getPost(id: number) {
                 select: {
                   id: true,
                   username: true,
-                  profileImage: true,
                   level: true
                 }
               }
@@ -122,7 +163,6 @@ export default async function PostDetailPage({ params }: Props) {
 
   return (
     <>
-      <Navigation />
       <PostViewCounter postId={post.id} />
       <main className="min-h-screen bg-dark-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

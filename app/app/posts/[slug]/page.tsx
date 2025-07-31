@@ -1,12 +1,9 @@
 import { Suspense } from 'react'
-import Navigation from '@/components/layout/Navigation'
 import PostListContent from './PostListContent'
 
 export default function BoardPostsPage() {
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900">
         <Suspense 
           fallback={
             <div className="flex justify-center items-center h-screen">
@@ -17,6 +14,5 @@ export default function BoardPostsPage() {
           <PostListContent />
         </Suspense>
       </main>
-    </>
   )
 }

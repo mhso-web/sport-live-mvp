@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import Navigation from '@/components/layout/Navigation'
 
 interface BoardCategory {
   id: number
@@ -159,12 +158,9 @@ export default function PostEditPage({ params }: { params: { id: string } }) {
 
   if (status === 'loading' || isLoading) {
     return (
-      <>
-        <Navigation />
-        <main className="min-h-screen bg-dark-900 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
-        </main>
-      </>
+      <main className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
+      </main>
     )
   }
 
@@ -173,9 +169,7 @@ export default function PostEditPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 헤더 */}
           <div className="mb-8">
@@ -287,6 +281,5 @@ export default function PostEditPage({ params }: { params: { id: string } }) {
           </div>
         </div>
       </main>
-    </>
   )
 }

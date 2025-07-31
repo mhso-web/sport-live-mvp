@@ -17,7 +17,6 @@ interface Comment {
   user: {
     id: number
     username: string
-    profileImage: string | null
     level: number
   }
   replies: Comment[]
