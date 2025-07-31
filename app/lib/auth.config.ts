@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma'
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
+      id: 'credentials',
       name: 'credentials',
       credentials: {
         username: { label: 'Username', type: 'text' },

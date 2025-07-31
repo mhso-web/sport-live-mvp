@@ -18,6 +18,10 @@ const nextConfig = {
       },
     ];
   },
+  // Vercel 환경에서 NEXTAUTH_URL 자동 설정
+  env: {
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+  },
 };
 
 module.exports = nextConfig;

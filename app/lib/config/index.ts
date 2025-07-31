@@ -8,7 +8,7 @@ const ConfigSchema = z.object({
   DATABASE_URL: z.string(),
   
   // Auth
-  NEXTAUTH_URL: z.string().url(),
+  NEXTAUTH_URL: z.string().url().optional(),
   NEXTAUTH_SECRET: z.string().min(32),
   JWT_SECRET: z.string().min(32).optional(),
   
