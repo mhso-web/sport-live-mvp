@@ -25,6 +25,9 @@ export default withAuth(
         new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
       )
     }
+    
+    // 인증된 사용자는 그대로 통과
+    return NextResponse.next()
   },
   {
     callbacks: {

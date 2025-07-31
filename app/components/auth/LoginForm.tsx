@@ -57,7 +57,10 @@ export default function LoginForm() {
         setErrors({ general: '아이디 또는 비밀번호가 올바르지 않습니다' })
       } else if (result?.ok) {
         // 로그인 성공
-        window.location.href = from // router.push 대신 전체 페이지 리로드
+        // Vercel에서는 절대 경로 사용
+        const redirectUrl = from === '/' ? '/' : from
+        router.push(redirectUrl)
+        router.refresh()
       }
     } catch (error) {
       console.error('Login exception:', error)

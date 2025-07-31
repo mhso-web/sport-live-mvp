@@ -12,6 +12,9 @@ import UserBadge from '@/components/ui/UserBadge'
 import { getLevelColorClass } from '@/lib/utils/levelUtils'
 import type { Prisma } from '@prisma/client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: {
     slug: string

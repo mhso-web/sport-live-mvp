@@ -111,6 +111,25 @@ export default function PostListContent() {
           'Cache-Control': 'no-cache'
         }
       })
+      
+      if (!response.ok) {
+        console.error(`Failed to fetch category: ${response.status}`)
+        // API 실패 시 기본 카테고리 데이터 사용
+        const defaultCategories: Record<string, BoardCategory> = {
+          general: { id: 1, name: '자유게시판', description: '자유롭게 대화를 나누는 공간', icon: '💬', color: '#60A5FA' },
+          soccer: { id: 2, name: '축구', description: '축구 관련 정보와 토론', icon: '⚽', color: '#34D399' },
+          baseball: { id: 3, name: '야구', description: '야구 관련 정보와 토론', icon: '⚾', color: '#F87171' },
+          basketball: { id: 4, name: '농구', description: '농구 관련 정보와 토론', icon: '🏀', color: '#FB923C' }
+        }
+        
+        if (defaultCategories[slug]) {
+          setCategory(defaultCategories[slug])
+        } else {
+          router.push('/posts')
+        }
+        return
+      }
+      
       const data = await response.json()
       
       if (data.success) {
@@ -120,7 +139,19 @@ export default function PostListContent() {
       }
     } catch (error) {
       console.error('Failed to fetch category:', error)
-      router.push('/posts')
+      // API 호출 실패 시에도 기본 카테고리로 시도
+      const defaultCategories: Record<string, BoardCategory> = {
+        general: { id: 1, name: '자유게시판', description: '자유롭게 대화를 나누는 공간', icon: '💬', color: '#60A5FA' },
+        soccer: { id: 2, name: '축구', description: '축구 관련 정보와 토론', icon: '⚽', color: '#34D399' },
+        baseball: { id: 3, name: '야구', description: '야구 관련 정보와 토론', icon: '⚾', color: '#F87171' },
+        basketball: { id: 4, name: '농구', description: '농구 관련 정보와 토론', icon: '🏀', color: '#FB923C' }
+      }
+      
+      if (defaultCategories[slug]) {
+        setCategory(defaultCategories[slug])
+      } else {
+        router.push('/posts')
+      }
     }
   }
 

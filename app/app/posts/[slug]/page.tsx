@@ -1,5 +1,32 @@
 import { Suspense } from 'react'
 import PostListContent from './PostListContent'
+import { prisma } from '@/lib/prisma'
+
+// Dynamic route params generation for build time
+export async function generateStaticParams() {
+  try {
+    const categories = await prisma.boardCategory.findMany({
+      where: { boardType: 'COMMUNITY' },
+      select: { slug: true }
+    })
+    
+    return categories.map((category) => ({
+      slug: category.slug,
+    }))
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    // Return default categories if database is not available
+    return [
+      { slug: 'general' },
+      { slug: 'soccer' },
+      { slug: 'baseball' },
+      { slug: 'basketball' },
+    ]
+  }
+}
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
 
 export default function BoardPostsPage() {
   return (
