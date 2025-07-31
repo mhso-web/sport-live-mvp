@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth.config'
 import { prisma } from '@/lib/prisma'
 import { ExperienceService } from '@/lib/services/experienceService'
+import { ApiResponse } from '@/lib/utils/apiResponse'
+import { UnauthorizedException, NotFoundException } from '@/lib/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,102 +16,98 @@ export async function POST(
     const session = await getServerSession(authOptions)
     
     if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      throw new UnauthorizedException()
     }
 
     const commentId = parseInt(params.id)
     const userId = parseInt(session.user.id)
 
-    // Check if comment exists
-    const comment = await prisma.comment.findUnique({
-      where: { id: commentId }
-    })
+    // 트랜잭션으로 처리
+    const result = await prisma.$transaction(async (tx) => {
+      // Check if comment exists
+      const comment = await tx.comment.findUnique({
+        where: { id: commentId }
+      })
 
-    if (!comment) {
-      return NextResponse.json(
-        { success: false, error: 'Comment not found' },
-        { status: 404 }
-      )
-    }
-
-    // Check if already liked
-    const existingLike = await prisma.commentLike.findUnique({
-      where: {
-        commentId_userId: {
-          commentId,
-          userId
-        }
+      if (!comment) {
+        throw new NotFoundException('댓글')
       }
-    })
 
-    if (existingLike) {
-      // Unlike
-      await prisma.commentLike.delete({
+      // Check if already liked
+      const existingLike = await tx.commentLike.findUnique({
         where: {
-          id: existingLike.id
+          commentId_userId: {
+            commentId,
+            userId
+          }
         }
       })
 
-      // Update likes count
-      await prisma.comment.update({
-        where: { id: commentId },
-        data: { likesCount: { decrement: 1 } }
-      })
+      let liked: boolean
+      let likesCount: number
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          liked: false,
-          likesCount: comment.likesCount - 1
-        }
-      })
-    } else {
-      // Like
-      await prisma.commentLike.create({
-        data: {
-          commentId,
-          userId
-        }
-      })
-
-      // Update likes count
-      await prisma.comment.update({
-        where: { id: commentId },
-        data: { likesCount: { increment: 1 } }
-      })
-
-      // 경험치 부여
-      // 좋아요를 누른 사람에게
-      await ExperienceService.awardExperience(userId, 'COMMENT_LIKE', {
-        commentId,
-        authorId: comment.userId
-      })
-      
-      // 좋아요를 받은 사람에게 (본인 댓글이 아닌 경우)
-      if (comment.userId !== userId) {
-        await ExperienceService.awardExperience(comment.userId, 'RECEIVED_LIKE', {
-          commentId,
-          likedByUserId: userId
+      if (existingLike) {
+        // Unlike - 좋아요 취소
+        await tx.commentLike.delete({
+          where: {
+            id: existingLike.id
+          }
         })
+
+        // Update likes count
+        const updatedComment = await tx.comment.update({
+          where: { id: commentId },
+          data: { likesCount: { decrement: 1 } }
+        })
+
+        liked = false
+        likesCount = updatedComment.likesCount
+      } else {
+        // Like - 좋아요 추가
+        await tx.commentLike.create({
+          data: {
+            commentId,
+            userId
+          }
+        })
+
+        // Update likes count
+        const updatedComment = await tx.comment.update({
+          where: { id: commentId },
+          data: { likesCount: { increment: 1 } }
+        })
+
+        liked = true
+        likesCount = updatedComment.likesCount
+
+        // 경험치 부여 (트랜잭션 내에서 처리)
+        // 좋아요를 누른 사람에게
+        await ExperienceService.awardExperience(userId, 'COMMENT_LIKE', {
+          commentId,
+          authorId: comment.userId
+        })
+        
+        // 좋아요를 받은 사람에게 (본인 댓글이 아닌 경우)
+        if (comment.userId !== userId) {
+          await ExperienceService.awardExperience(comment.userId, 'RECEIVED_LIKE', {
+            commentId,
+            likedByUserId: userId
+          })
+        }
       }
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          liked: true,
-          likesCount: comment.likesCount + 1
-        }
-      })
-    }
+      return {
+        liked,
+        likesCount
+      }
+    })
+
+    return ApiResponse.success({
+      liked: result.liked,
+      likesCount: result.likesCount
+    })
   } catch (error) {
-    console.error('Failed to toggle comment like:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return ApiResponse.error(error)
   }
 }
 
@@ -122,11 +120,8 @@ export async function GET(
     const commentId = parseInt(params.id)
 
     if (!session?.user) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          liked: false
-        }
+      return ApiResponse.success({
+        liked: false
       })
     }
 
@@ -141,17 +136,10 @@ export async function GET(
       }
     })
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        liked: !!like
-      }
+    return ApiResponse.success({
+      liked: !!like
     })
   } catch (error) {
-    console.error('Failed to get comment like status:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return ApiResponse.error(error)
   }
 }

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { BoardService } from '@/lib/services/boardService'
 import { BoardCategoryRepository } from '@/lib/repositories/boardCategoryRepository'
-import { handleApiError } from '@/lib/errors'
+import { ApiResponse } from '@/lib/utils/apiResponse'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,11 +19,8 @@ export async function GET(request: NextRequest) {
       categories = await boardService.getAllCategories()
     }
 
-    return NextResponse.json({
-      data: categories,
-      success: true
-    })
+    return ApiResponse.success(categories)
   } catch (error) {
-    return handleApiError(error)
+    return ApiResponse.error(error)
   }
 }
