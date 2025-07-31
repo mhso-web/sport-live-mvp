@@ -8,8 +8,7 @@ import { z } from 'zod'
 export const dynamic = 'force-dynamic'
 
 const updateProfileSchema = z.object({
-  bio: z.string().min(10).max(500).optional(),
-  profileImage: z.string().url().optional()
+  bio: z.string().min(10).max(500).optional()
 })
 
 export async function PATCH(
@@ -34,7 +33,7 @@ export async function PATCH(
     // 현재 프로필 상태 확인
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { bio: true, profileImage: true }
+      select: { bio: true }
     })
     
     if (!currentUser) {
@@ -50,9 +49,8 @@ export async function PATCH(
       data: validatedData
     })
     
-    // 프로필 완성 체크 (bio와 profileImage가 모두 있을 때)
-    if ((!currentUser.bio || !currentUser.profileImage) && 
-        updatedUser.bio && updatedUser.profileImage) {
+    // 프로필 완성 체크 (bio가 있을 때)
+    if (!currentUser.bio && updatedUser.bio) {
       // 이미 프로필 완성 경험치를 받았는지 확인
       const existingLog = await prisma.userExperienceLog.findFirst({
         where: {
@@ -73,7 +71,6 @@ export async function PATCH(
         username: updatedUser.username,
         email: updatedUser.email,
         bio: updatedUser.bio,
-        profileImage: updatedUser.profileImage,
         level: updatedUser.level,
         experience: updatedUser.experience
       }
