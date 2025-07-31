@@ -16,7 +16,6 @@ export class PostResponseDto {
     id: number
     username: string
     level: number
-    profileImage: string | null
   }
   stats: {
     views: number
@@ -38,8 +37,7 @@ export class PostResponseDto {
     this.author = {
       id: post.user.id,
       username: post.user.username,
-      level: post.user.level,
-      profileImage: post.user.profileImage
+      level: post.user.level
     }
     this.stats = {
       views: post.views,

@@ -1,10 +1,6 @@
-import Navigation from '@/components/layout/Navigation'
-
 export default function Home() {
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <h1 className="text-4xl font-bold sm:text-6xl">
@@ -48,6 +44,5 @@ export default function Home() {
           </div>
         </div>
       </main>
-    </>
   )
 }

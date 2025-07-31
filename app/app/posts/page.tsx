@@ -1,4 +1,3 @@
-import Navigation from '@/components/layout/Navigation'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
@@ -87,9 +86,7 @@ export default async function PostsPageSSR() {
   const boardSections = await getBoardsWithPosts()
 
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-100">게시판</h1>
@@ -172,6 +169,5 @@ export default async function PostsPageSSR() {
           )}
         </div>
       </main>
-    </>
   )
 }

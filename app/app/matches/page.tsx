@@ -1,10 +1,6 @@
-import Navigation from '@/components/layout/Navigation'
-
 export default function MatchesPage() {
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-16">
             <div className="text-6xl mb-4">⚽</div>
@@ -13,6 +9,5 @@ export default function MatchesPage() {
           </div>
         </div>
       </main>
-    </>
   )
 }

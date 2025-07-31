@@ -18,7 +18,6 @@ model User {
   experience      Int      @default(0)
   level           Int      @default(1)
   role            Role     @default(USER)
-  profileImage    String?  @map("profile_image")
   bio             String?
   isActive        Boolean  @default(true) @map("is_active")
   lastLoginAt     DateTime? @map("last_login_at")

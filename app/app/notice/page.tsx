@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import Navigation from '@/components/layout/Navigation'
 import { prisma } from '@/lib/prisma'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
@@ -55,9 +54,7 @@ export default async function NoticePage() {
   const notices = await getNotices()
 
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 헤더 */}
           <div className="mb-8">
@@ -148,6 +145,5 @@ export default async function NoticePage() {
           {/* 페이지네이션 추가 예정 */}
         </div>
       </main>
-    </>
   )
 }

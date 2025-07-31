@@ -199,11 +199,18 @@ export default function Navigation() {
                       />
                     </div>
                     <Link
-                      href="/profile"
+                      href={`/profile/${session.user.id}`}
                       className="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-600 hover:text-gold-500 transition-colors duration-200"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       프로필
+                    </Link>
+                    <Link
+                      href="/profile/my-activities"
+                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-600 hover:text-gold-500 transition-colors duration-200"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      내 활동 내역
                     </Link>
                     <Link
                       href="/settings"
@@ -355,8 +362,9 @@ export default function Navigation() {
                 </div>
                 <div className="space-y-1">
                   <Link
-                    href="/profile"
+                    href={`/profile/${session.user.id}`}
                     className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-dark-700 transition-colors duration-200"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     프로필
                   </Link>

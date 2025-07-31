@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { BadgeService } from './badgeService'
 
 export type ExperienceActionType = 
   | 'POST_CREATE'       // 게시글 작성
@@ -150,6 +151,17 @@ export class ExperienceService {
           metadata
         }
       })
+      
+      // 레벨업 시 뱃지 체크
+      if (leveledUp) {
+        try {
+          const badgeService = new BadgeService()
+          await badgeService.checkLevelBadges(userId, newLevel)
+        } catch (error) {
+          console.error('[ExperienceService] Error checking level badges:', error)
+          // 뱃지 체크 실패해도 경험치 부여는 성공
+        }
+      }
       
       return {
         experienceGained,

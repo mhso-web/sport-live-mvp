@@ -39,7 +39,7 @@ export class PartnerRepository implements IRepository<Partner> {
           where: { isDeleted: false },
           include: {
             user: {
-              select: { id: true, username: true, profileImage: true, level: true }
+              select: { id: true, username: true, level: true }
             }
           },
           orderBy: { createdAt: 'desc' }

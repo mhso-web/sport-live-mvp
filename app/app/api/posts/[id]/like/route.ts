@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth.config'
 import { PostRepository } from '@/lib/repositories/postRepository'
 import { prisma } from '@/lib/prisma'
 import { ExperienceService } from '@/lib/services/experienceService'
+import { BadgeService } from '@/lib/services/badgeService'
 
 export const dynamic = 'force-dynamic'
 
@@ -102,6 +103,15 @@ export async function POST(
           postId,
           likedByUserId: userId
         })
+        
+        // 받은 좋아요 뱃지 체크
+        try {
+          const badgeService = new BadgeService()
+          await badgeService.checkLikeBadges(post.userId)
+        } catch (error) {
+          console.error('Error checking badges:', error)
+          // 뱃지 체크 실패해도 좋아요는 성공
+        }
       }
 
       // 최신 사용자 정보 가져오기

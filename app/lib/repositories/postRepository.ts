@@ -7,7 +7,6 @@ export interface PostWithRelations extends Post {
     id: number
     username: string
     level: number
-    profileImage: string | null
   }
   category: {
     id: number
@@ -57,8 +56,7 @@ export class PostRepository implements IPostRepository {
           select: {
             id: true,
             username: true,
-            level: true,
-            profileImage: true
+            level: true
           }
         },
         category: {
@@ -125,8 +123,7 @@ export class PostRepository implements IPostRepository {
             select: {
               id: true,
               username: true,
-              level: true,
-              profileImage: true
+              level: true
             }
           },
           category: {

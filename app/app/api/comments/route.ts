@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth.config'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { ExperienceService } from '@/lib/services/experienceService'
+import { BadgeService } from '@/lib/services/badgeService'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,7 +55,6 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             username: true,
-            profileImage: true,
             level: true
           }
         }
@@ -86,6 +86,15 @@ export async function POST(request: NextRequest) {
         commentId: comment.id,
         postId: validatedData.postId
       })
+    }
+
+    // 뱃지 체크
+    try {
+      const badgeService = new BadgeService()
+      await badgeService.checkCommentBadges(userId)
+    } catch (error) {
+      console.error('Error checking badges:', error)
+      // 뱃지 체크 실패해도 댓글 작성은 성공
     }
 
     // 최신 사용자 정보 가져오기

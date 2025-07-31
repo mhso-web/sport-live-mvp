@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import { RegisterDto, RegisterSchema } from '@/lib/dto/auth/register.dto'
 import { LoginDto, LoginSchema } from '@/lib/dto/auth/login.dto'
 import { UserRepository } from '@/lib/repositories/userRepository'
+import { BadgeService } from '@/lib/services/badgeService'
 import { ConflictException, UnauthorizedException, ValidationError } from '@/lib/errors'
 import { config } from '@/lib/config'
 import type { User } from '@prisma/client'
@@ -57,7 +58,16 @@ export class AuthService {
       passwordHash: hashedPassword
     })
 
-    // 6. JWT 토큰 생성
+    // 6. 얼리 어답터 뱃지 체크
+    try {
+      const badgeService = new BadgeService()
+      await badgeService.checkEarlyAdopterBadge(user.id)
+    } catch (error) {
+      console.error('[AuthService] Error checking early adopter badge:', error)
+      // 뱃지 체크 실패해도 회원가입은 성공
+    }
+
+    // 7. JWT 토큰 생성
     const token = this.generateToken(user)
 
     return {

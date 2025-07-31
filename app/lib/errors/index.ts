@@ -44,6 +44,15 @@ export class NotFoundException extends AppError {
   }
 }
 
+export class BadRequestException extends AppError {
+  statusCode = 400
+  code = 'BAD_REQUEST'
+
+  constructor(message: string) {
+    super(message)
+  }
+}
+
 export class ConflictException extends AppError {
   statusCode = 409
   code = 'CONFLICT'

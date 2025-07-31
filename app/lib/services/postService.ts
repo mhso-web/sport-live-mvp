@@ -13,6 +13,7 @@ import {
   ValidationError 
 } from '@/lib/errors'
 import { ExperienceService } from './experienceService'
+import { BadgeService } from './badgeService'
 
 interface AuthenticatedRequest {
   userId: number
@@ -20,11 +21,15 @@ interface AuthenticatedRequest {
 }
 
 export class PostService {
+  private badgeService: BadgeService
+
   constructor(
     private postRepository: PostRepository,
     private boardCategoryRepository: BoardCategoryRepository,
     private userRepository: UserRepository
-  ) {}
+  ) {
+    this.badgeService = new BadgeService()
+  }
 
   async create(data: CreatePostDto, auth: AuthenticatedRequest) {
     // 입력값 검증
@@ -76,6 +81,15 @@ export class PostService {
     } catch (error) {
       console.error('[PostService] Error awarding experience:', error)
       // 경험치 부여 실패해도 게시글 작성은 성공
+    }
+
+    // 뱃지 체크
+    try {
+      console.log(`[PostService] Checking badges for post creation: userId=${auth.userId}`)
+      await this.badgeService.checkPostBadges(auth.userId)
+    } catch (error) {
+      console.error('[PostService] Error checking badges:', error)
+      // 뱃지 체크 실패해도 게시글 작성은 성공
     }
 
     // 상세 정보 조회 후 반환

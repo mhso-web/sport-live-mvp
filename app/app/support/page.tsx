@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/layout/Navigation'
 
 type TabType = 'notice' | 'faq' | 'inquiry'
 
@@ -16,9 +15,7 @@ export default function SupportPage() {
   ]
 
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 헤더 */}
           <div className="mb-8">
@@ -52,7 +49,6 @@ export default function SupportPage() {
           </div>
         </div>
       </main>
-    </>
   )
 }
 
