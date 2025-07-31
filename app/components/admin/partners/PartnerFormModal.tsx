@@ -20,6 +20,20 @@ interface PartnerFormModalProps {
   partner?: Partner | null
 }
 
+// 이미지 URL을 절대 경로로 변환하는 헬퍼 함수
+const getImageUrl = (url: string | undefined): string => {
+  if (!url) return ''
+  // 이미 전체 URL인 경우 그대로 반환
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  // 상대 경로인 경우 현재 도메인 기준으로 전체 URL 생성
+  if (url.startsWith('/')) {
+    return `${window.location.origin}${url}`
+  }
+  return url
+}
+
 export default function PartnerFormModal({
   isOpen,
   onClose,
@@ -40,6 +54,20 @@ export default function PartnerFormModal({
   const [uploadingContent, setUploadingContent] = useState(false)
   const detailContentRef = useRef<HTMLTextAreaElement>(null)
 
+  // 모달이 열릴 때 body 스크롤 방지
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    // 컴포넌트 언마운트 시 스타일 초기화
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   useEffect(() => {
     if (partner) {
       setFormData({
@@ -47,7 +75,7 @@ export default function PartnerFormModal({
         description: partner.description,
         detailContent: partner.detailContent || '',
         websiteUrl: partner.websiteUrl || '',
-        bannerImage: partner.bannerImage || '',
+        bannerImage: getImageUrl(partner.bannerImage),
         isActive: partner.isActive
       })
     } else {
@@ -346,7 +374,7 @@ export default function PartnerFormModal({
               {formData.bannerImage && (
                 <div className="relative rounded-lg overflow-hidden bg-gray-800">
                   <img
-                    src={formData.bannerImage}
+                    src={getImageUrl(formData.bannerImage)}
                     alt="배너 미리보기"
                     className="w-full h-32 object-cover"
                   />
