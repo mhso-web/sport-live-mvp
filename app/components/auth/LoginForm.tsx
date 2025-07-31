@@ -50,14 +50,18 @@ export default function LoginForm() {
         redirect: false
       })
 
+      console.log('Login result:', result) // 디버깅용
+
       if (result?.error) {
+        console.error('Login error:', result.error)
         setErrors({ general: '아이디 또는 비밀번호가 올바르지 않습니다' })
-      } else {
-        router.push(from)
-        router.refresh()
+      } else if (result?.ok) {
+        // 로그인 성공
+        window.location.href = from // router.push 대신 전체 페이지 리로드
       }
     } catch (error) {
-      setErrors({ general: '서버 오류가 발생했습니다' })
+      console.error('Login exception:', error)
+      setErrors({ general: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' })
     } finally {
       setIsLoading(false)
     }

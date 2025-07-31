@@ -40,12 +40,23 @@ export default function Navigation() {
   const fetchBoards = async () => {
     try {
       const response = await fetch('/api/boards?type=COMMUNITY')
+      if (!response.ok) {
+        console.error('Failed to fetch boards:', response.status)
+        return
+      }
       const data = await response.json()
       if (data.success) {
         setBoardCategories(data.data)
       }
     } catch (error) {
       console.error('Failed to fetch boards:', error)
+      // 기본 카테고리 설정 (API 실패 시)
+      setBoardCategories([
+        { id: 1, slug: 'general', name: '자유게시판', icon: '💬', color: '#60A5FA' },
+        { id: 2, slug: 'soccer', name: '축구', icon: '⚽', color: '#34D399' },
+        { id: 3, slug: 'baseball', name: '야구', icon: '⚾', color: '#F87171' },
+        { id: 4, slug: 'basketball', name: '농구', icon: '🏀', color: '#FB923C' }
+      ])
     }
   }
 
