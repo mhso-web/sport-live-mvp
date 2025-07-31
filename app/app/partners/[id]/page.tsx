@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import Navigation from '@/components/layout/Navigation'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import ViewCounter from '@/components/partners/ViewCounter'
@@ -118,7 +117,6 @@ export default async function PartnerDetailPage({ params }: Props) {
 
   return (
     <>
-      <Navigation />
       <ViewCounter partnerId={partner.id} />
       <main className="min-h-screen bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
