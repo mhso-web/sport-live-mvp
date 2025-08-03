@@ -394,6 +394,7 @@ export default function Navigation() {
                   <Link
                     href="/settings"
                     className="block px-4 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-dark-700 transition-colors duration-200"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     설정
                   </Link>
@@ -419,12 +420,14 @@ export default function Navigation() {
                 <Link
                   href="/login"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   로그인
                 </Link>
                 <Link
                   href="/register"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   회원가입
                 </Link>
