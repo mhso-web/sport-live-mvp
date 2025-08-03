@@ -154,14 +154,15 @@ export default function PartnerManagementContent() {
           {/* 추가 버튼 */}
           <button
             onClick={() => setIsFormModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-gray-900 rounded-lg hover:bg-yellow-400 transition-colors font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-gray-900 rounded-lg hover:bg-yellow-400 transition-colors font-medium whitespace-nowrap"
           >
             <FaPlus />
-            새 보증업체 추가
+            <span className="hidden sm:inline">새 보증업체 추가</span>
+            <span className="sm:hidden">추가</span>
           </button>
         </div>
 
-        {/* 테이블 */}
+        {/* 데이터 표시 */}
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400"></div>
@@ -171,89 +172,167 @@ export default function PartnerManagementContent() {
             <p>등록된 보증업체가 없습니다.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">ID</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">업체명</th>
-                  <th className="text-center py-3 px-4 text-gray-400 font-medium">상태</th>
-                  <th className="text-center py-3 px-4 text-gray-400 font-medium">평점</th>
-                  <th className="text-center py-3 px-4 text-gray-400 font-medium">댓글</th>
-                  <th className="text-center py-3 px-4 text-gray-400 font-medium">조회수</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">등록일</th>
-                  <th className="text-center py-3 px-4 text-gray-400 font-medium">관리</th>
-                </tr>
-              </thead>
-              <tbody>
-                {partners.map((partner) => (
-                  <tr key={partner.id} className="border-b border-gray-800 hover:bg-gray-800/50">
-                    <td className="py-4 px-4 text-gray-300">{partner.id}</td>
-                    <td className="py-4 px-4">
-                      <div>
-                        <p className="text-white font-medium">{partner.name}</p>
-                        <p className="text-sm text-gray-400 truncate max-w-xs">
-                          {partner.description}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-center">
-                      <button
-                        onClick={() => handleToggleStatus(partner)}
-                        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                          partner.isActive
-                            ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                            : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                        }`}
-                      >
-                        {partner.isActive ? '활성' : '비활성'}
-                      </button>
-                    </td>
-                    <td className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <FaStar className="text-yellow-400 w-4 h-4" />
-                        <span className="text-white">
-                          {partner.avgRating.toFixed(1)}
-                        </span>
-                        <span className="text-gray-400 text-sm">
-                          ({partner._count.ratings})
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-center text-gray-300">
-                      {partner._count.comments}
-                    </td>
-                    <td className="py-4 px-4 text-center text-gray-300">
-                      {partner.viewCount.toLocaleString()}
-                    </td>
-                    <td className="py-4 px-4 text-gray-300">
-                      {formatDate(partner.createdAt)}
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => handleEdit(partner)}
-                          className="p-2 text-gray-400 hover:text-yellow-400 transition-colors"
-                          title="수정"
-                        >
-                          <FaEdit />
-                        </button>
-                        {session?.user?.role === 'ADMIN' && (
-                          <button
-                            onClick={() => setDeletingPartner(partner)}
-                            className="p-2 text-gray-400 hover:text-red-400 transition-colors"
-                            title="삭제"
-                          >
-                            <FaTrash />
-                          </button>
-                        )}
-                      </div>
-                    </td>
+          <>
+            {/* 데스크톱 테이블 */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-800">
+                    <th className="text-left py-3 px-4 text-gray-400 font-medium">ID</th>
+                    <th className="text-left py-3 px-4 text-gray-400 font-medium">업체명</th>
+                    <th className="text-center py-3 px-4 text-gray-400 font-medium">상태</th>
+                    <th className="text-center py-3 px-4 text-gray-400 font-medium">평점</th>
+                    <th className="text-center py-3 px-4 text-gray-400 font-medium">댓글</th>
+                    <th className="text-center py-3 px-4 text-gray-400 font-medium">조회수</th>
+                    <th className="text-left py-3 px-4 text-gray-400 font-medium">등록일</th>
+                    <th className="text-center py-3 px-4 text-gray-400 font-medium">관리</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {partners.map((partner) => (
+                    <tr key={partner.id} className="border-b border-gray-800 hover:bg-gray-800/50">
+                      <td className="py-4 px-4 text-gray-300">{partner.id}</td>
+                      <td className="py-4 px-4">
+                        <div>
+                          <p className="text-white font-medium">{partner.name}</p>
+                          <p className="text-sm text-gray-400 truncate max-w-xs">
+                            {partner.description}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <button
+                          onClick={() => handleToggleStatus(partner)}
+                          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                            partner.isActive
+                              ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                              : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                          }`}
+                        >
+                          {partner.isActive ? '활성' : '비활성'}
+                        </button>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <FaStar className="text-yellow-400 w-4 h-4" />
+                          <span className="text-white">
+                            {partner.avgRating.toFixed(1)}
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            ({partner._count.ratings})
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-center text-gray-300">
+                        {partner._count.comments}
+                      </td>
+                      <td className="py-4 px-4 text-center text-gray-300">
+                        {partner.viewCount.toLocaleString()}
+                      </td>
+                      <td className="py-4 px-4 text-gray-300">
+                        {formatDate(partner.createdAt)}
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleEdit(partner)}
+                            className="p-2 text-gray-400 hover:text-yellow-400 transition-colors"
+                            title="수정"
+                          >
+                            <FaEdit />
+                          </button>
+                          {session?.user?.role === 'ADMIN' && (
+                            <button
+                              onClick={() => setDeletingPartner(partner)}
+                              className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                              title="삭제"
+                            >
+                              <FaTrash />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 모바일 카드 레이아웃 */}
+            <div className="lg:hidden space-y-4">
+              {partners.map((partner) => (
+                <div
+                  key={partner.id}
+                  className="bg-gray-800 rounded-lg p-4 border border-gray-700"
+                >
+                  {/* 헤더 - 업체명과 상태 */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="text-white font-medium text-lg">{partner.name}</h3>
+                      <p className="text-gray-400 text-sm mt-1">{partner.description}</p>
+                    </div>
+                    <button
+                      onClick={() => handleToggleStatus(partner)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ml-3 ${
+                        partner.isActive
+                          ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                          : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                      }`}
+                    >
+                      {partner.isActive ? '활성' : '비활성'}
+                    </button>
+                  </div>
+
+                  {/* 통계 정보 */}
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <FaStar className="text-yellow-400 w-4 h-4" />
+                      <span className="text-white text-sm">
+                        {partner.avgRating.toFixed(1)}
+                      </span>
+                      <span className="text-gray-400 text-xs">
+                        ({partner._count.ratings})
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-300">
+                      댓글 {partner._count.comments}
+                    </div>
+                    <div className="text-sm text-gray-300">
+                      조회수 {partner.viewCount.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-300">
+                      ID: {partner.id}
+                    </div>
+                  </div>
+
+                  {/* 하단 - 등록일과 관리 버튼 */}
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-700">
+                    <span className="text-sm text-gray-400">
+                      {formatDate(partner.createdAt)}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEdit(partner)}
+                        className="flex items-center gap-1 px-3 py-1 text-xs bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 transition-colors"
+                      >
+                        <FaEdit className="w-3 h-3" />
+                        수정
+                      </button>
+                      {session?.user?.role === 'ADMIN' && (
+                        <button
+                          onClick={() => setDeletingPartner(partner)}
+                          className="flex items-center gap-1 px-3 py-1 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
+                        >
+                          <FaTrash className="w-3 h-3" />
+                          삭제
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
         {/* 페이지네이션 */}
