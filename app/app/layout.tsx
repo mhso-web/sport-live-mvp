@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import SessionProvider from '@/components/providers/SessionProvider'
-import Navigation from '@/components/layout/Navigation'
+import ConditionalNavigation from '@/components/layout/ConditionalNavigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <SessionProvider>
-          <Navigation />
+          <ConditionalNavigation />
           {children}
         </SessionProvider>
       </body>

@@ -105,14 +105,26 @@ export default function AdminSidebar({ userRole }: AdminSidebarProps) {
 
   return (
     <>
-      {/* 모바일 햄버거 메뉴 버튼 */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-900 text-yellow-400 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors"
-        aria-label="메뉴 열기/닫기"
-      >
-        {isSidebarOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
-      </button>
+      {/* 관리자 상단 헤더 (모바일용) */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 text-yellow-400 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors"
+          aria-label="메뉴 열기/닫기"
+        >
+          {isSidebarOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
+        </button>
+        
+        <h1 className="text-lg font-bold text-yellow-400">관리자 패널</h1>
+        
+        <Link
+          href="/"
+          className="p-2 text-gray-400 hover:text-yellow-400 rounded-lg transition-colors"
+          title="홈으로 이동"
+        >
+          <FaHome className="w-5 h-5" />
+        </Link>
+      </div>
 
       {/* 모바일 오버레이 */}
       {isSidebarOpen && (
@@ -131,7 +143,16 @@ export default function AdminSidebar({ userRole }: AdminSidebarProps) {
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6">
-          <h2 className="text-xl font-bold text-yellow-400 mb-8">관리자 패널</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold text-yellow-400">관리자 패널</h2>
+            <Link
+              href="/"
+              className="hidden lg:flex p-2 text-gray-400 hover:text-yellow-400 rounded-lg transition-colors"
+              title="홈으로 이동"
+            >
+              <FaHome className="w-5 h-5" />
+            </Link>
+          </div>
           
           <nav className="space-y-2">
             {filteredMenuItems.map((item) => {
