@@ -77,7 +77,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       request as any
     )
 
-    return ApiResponse.success(comment, '댓글이 작성되었습니다.')
+    return ApiResponse.success({ 
+      comment,
+      message: '댓글이 작성되었습니다.'
+    })
   } catch (error) {
     console.error('Create comment error:', error)
     return ApiResponse.error(error)
