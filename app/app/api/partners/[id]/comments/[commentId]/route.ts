@@ -18,7 +18,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     await partnerService.deleteComment(commentId, request as any)
 
-    return ApiResponse.success(null, '댓글이 삭제되었습니다.')
+    return ApiResponse.success({ message: '댓글이 삭제되었습니다.' })
   } catch (error) {
     console.error('Delete comment error:', error)
     return ApiResponse.error(error)
