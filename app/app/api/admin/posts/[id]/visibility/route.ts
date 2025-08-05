@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     
     return ApiResponse.success({
       id: updatedPost.id,
-      isHidden: updatedPost.isHidden
+      isDeleted: updatedPost.isDeleted
     })
   } catch (error: any) {
     console.error('게시글 가시성 변경 오류:', error)
