@@ -25,7 +25,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const data = UpdateUserRoleDto.parse(body)
     
     const userId = parseInt(params.id)
-    const adminId = session.user.id
+    const adminId = parseInt(session.user.id)
     
     const updatedUser = await AdminUserService.updateRole(userId, data.role, adminId)
     
