@@ -22,7 +22,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const userId = parseInt(params.id)
-    const adminId = session.user.id
+    const adminId = parseInt(session.user.id)
     
     const updatedUser = await AdminUserService.toggleStatus(userId, adminId)
     
