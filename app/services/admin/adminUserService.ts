@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { Role } from '@prisma/client'
 
 // 사용자 필터 DTO
 export const UserFiltersDto = z.object({
@@ -132,7 +133,7 @@ export class AdminUserService {
           }
         },
         badges: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { earnedAt: 'desc' },
           take: 5
         }
       }
@@ -208,7 +209,7 @@ export class AdminUserService {
   /**
    * 사용자 권한 변경
    */
-  static async updateRole(userId: number, newRole: string, adminId: number) {
+  static async updateRole(userId: number, newRole: Role, adminId: number) {
     // 자기 자신의 권한은 변경할 수 없음
     if (userId === adminId) {
       throw new Error('자신의 권한은 변경할 수 없습니다')

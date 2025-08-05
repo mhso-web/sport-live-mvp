@@ -46,7 +46,7 @@ export interface AdminPost {
   }
   _count: {
     comments: number
-    postLikes: number
+    likes: number
   }
 }
 
@@ -69,7 +69,7 @@ export interface AdminComment {
   }
   _count: {
     likes: number
-    children: number
+    replies: number
   }
 }
 
@@ -120,7 +120,7 @@ export class AdminPostService {
           _count: {
             select: {
               comments: true,
-              postLikes: true
+              likes: true
             }
           }
         }
@@ -128,7 +128,7 @@ export class AdminPostService {
 
       // 메모리에서 정렬
       posts.sort((a, b) => {
-        const diff = a._count.postLikes - b._count.postLikes
+        const diff = a._count.likes - b._count.likes
         return order === 'desc' ? -diff : diff
       })
 
@@ -159,7 +159,7 @@ export class AdminPostService {
           _count: {
             select: {
               comments: true,
-              postLikes: true
+              likes: true
             }
           }
         }
@@ -202,7 +202,7 @@ export class AdminPostService {
             _count: {
               select: {
                 comments: true,
-                postLikes: true
+                likes: true
               }
             }
           }
@@ -264,7 +264,7 @@ export class AdminPostService {
           _count: {
             select: {
               likes: true,
-              children: true
+              replies: true
             }
           }
         }
@@ -309,7 +309,7 @@ export class AdminPostService {
             _count: {
               select: {
                 likes: true,
-                children: true
+                replies: true
               }
             }
           }
@@ -420,7 +420,7 @@ export class AdminPostService {
       select: {
         id: true,
         name: true,
-        categoryType: true,
+        boardType: true,
         _count: {
           select: { posts: true }
         }

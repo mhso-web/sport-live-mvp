@@ -2,14 +2,13 @@ import { Partner, PartnerRating, PartnerComment, PartnerLike } from '@prisma/cli
 import { prisma } from '@/lib/prisma'
 import { PartnerRepository } from '@/lib/repositories/partnerRepository'
 import { AuthService } from '@/lib/services/authService'
-import { ExperienceService } from '@/lib/services/experienceService'
-import { ValidationError, UnauthorizedException, NotFoundError } from '@/lib/errors'
+import { UserRepository } from '@/lib/repositories/userRepository'
+import { ValidationError, UnauthorizedException, NotFoundException, BadRequestException } from '@/lib/errors'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth.config'
 
 export interface CreateRatingDto {
   rating: number
-  comment?: string
 }
 
 export interface CreateCommentDto {
@@ -19,8 +18,7 @@ export interface CreateCommentDto {
 export class PartnerService {
   constructor(
     private partnerRepository: PartnerRepository,
-    private authService: AuthService,
-    private experienceService: ExperienceService
+    private authService: AuthService
   ) {}
 
   // 별점 평가 추가/수정
@@ -37,13 +35,13 @@ export class PartnerService {
 
     // 유효성 검사
     if (data.rating < 1 || data.rating > 5) {
-      throw new ValidationError('평점은 1점에서 5점 사이여야 합니다.')
+      throw new BadRequestException('평점은 1점에서 5점 사이여야 합니다.')
     }
 
     // 파트너 존재 확인
     const partner = await this.partnerRepository.findById(partnerId)
     if (!partner || !partner.isActive) {
-      throw new NotFoundError('보증업체를 찾을 수 없습니다.')
+      throw new NotFoundException('보증업체')
     }
 
     const userId = parseInt(session.user.id)
@@ -66,7 +64,6 @@ export class PartnerService {
         where: { id: existingRating.id },
         data: {
           rating: data.rating,
-          comment: data.comment,
           updatedAt: new Date()
         }
       })
@@ -76,18 +73,9 @@ export class PartnerService {
         data: {
           partnerId,
           userId,
-          rating: data.rating,
-          comment: data.comment
+          rating: data.rating
         }
       })
-
-      // 첫 평점 작성시 경험치 부여
-      await this.experienceService.awardExperience(
-        userId,
-        'PARTNER_RATING',
-        3,
-        `${partner.name} 평가`
-      )
     }
 
     return rating
@@ -119,17 +107,17 @@ export class PartnerService {
 
     // 유효성 검사
     if (!data.content || data.content.trim().length < 10) {
-      throw new ValidationError('댓글은 10자 이상 작성해주세요.')
+      throw new BadRequestException('댓글은 10자 이상 작성해주세요.')
     }
 
     if (data.content.length > 500) {
-      throw new ValidationError('댓글은 500자 이내로 작성해주세요.')
+      throw new BadRequestException('댓글은 500자 이내로 작성해주세요.')
     }
 
     // 파트너 존재 확인
     const partner = await this.partnerRepository.findById(partnerId)
     if (!partner || !partner.isActive) {
-      throw new NotFoundError('보증업체를 찾을 수 없습니다.')
+      throw new NotFoundException('보증업체')
     }
 
     const userId = parseInt(session.user.id)
@@ -152,14 +140,6 @@ export class PartnerService {
       }
     })
 
-    // 댓글 작성 경험치 부여
-    await this.experienceService.awardExperience(
-      userId,
-      'PARTNER_COMMENT',
-      5,
-      `${partner.name} 댓글 작성`
-    )
-
     return comment
   }
 
@@ -179,7 +159,7 @@ export class PartnerService {
     })
 
     if (!comment) {
-      throw new NotFoundError('댓글을 찾을 수 없습니다.')
+      throw new NotFoundException('댓글')
     }
 
     // 본인 댓글이거나 관리자인 경우만 삭제 가능
@@ -208,7 +188,7 @@ export class PartnerService {
     // 파트너 존재 확인
     const partner = await this.partnerRepository.findById(partnerId)
     if (!partner || !partner.isActive) {
-      throw new NotFoundError('보증업체를 찾을 수 없습니다.')
+      throw new NotFoundException('보증업체')
     }
 
     const userId = parseInt(session.user.id)
@@ -240,14 +220,6 @@ export class PartnerService {
         }
       })
       liked = true
-
-      // 좋아요 경험치 부여
-      await this.experienceService.awardExperience(
-        userId,
-        'PARTNER_LIKE',
-        1,
-        `${partner.name} 좋아요`
-      )
     }
 
     // 전체 좋아요 수 조회
@@ -275,6 +247,5 @@ export class PartnerService {
 // 싱글톤 인스턴스 생성
 export const partnerService = new PartnerService(
   new PartnerRepository(),
-  new AuthService(),
-  new ExperienceService()
+  new AuthService(new UserRepository())
 )

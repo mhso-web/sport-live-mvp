@@ -3,6 +3,7 @@ import { partnerService } from '@/lib/services/partnerService'
 import { ApiResponse } from '@/lib/utils/apiResponse'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth.config'
+import { UnauthorizedException } from '@/lib/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return ApiResponse.error('로그인이 필요합니다.', 401)
+      return ApiResponse.error(new UnauthorizedException('로그인이 필요합니다.'))
     }
 
     const partnerId = parseInt(params.id)
@@ -27,7 +28,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return ApiResponse.success({
       rating: rating?.rating || 0,
-      comment: rating?.comment || '',
       hasRated: !!rating
     })
   } catch (error) {

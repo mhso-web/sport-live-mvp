@@ -344,7 +344,7 @@ export default function PostManagementContent() {
                           </span>
                           <span className="flex items-center gap-1">
                             <FaHeart className="w-3 h-3" />
-                            {post._count.postLikes}
+                            {post._count.likes}
                           </span>
                           <span className="flex items-center gap-1">
                             <FaComment className="w-3 h-3" />
@@ -523,7 +523,7 @@ export default function PostManagementContent() {
                           </span>
                           <span className="flex items-center gap-1">
                             <FaComment className="w-3 h-3" />
-                            {comment._count.children}
+                            {comment._count.replies}
                           </span>
                         </div>
                       </td>

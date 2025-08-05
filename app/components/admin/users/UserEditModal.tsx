@@ -20,7 +20,7 @@ export default function UserEditModal({ user, onClose, onSuccess }: UserEditModa
       return
     }
 
-    if (!confirm(`${user.nickname}님의 권한을 변경하시겠습니까?`)) {
+    if (!confirm(`${user.username}님의 권한을 변경하시겠습니까?`)) {
       return
     }
 
@@ -85,7 +85,7 @@ export default function UserEditModal({ user, onClose, onSuccess }: UserEditModa
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">닉네임</span>
-                <span className="text-white font-medium">{user.nickname}</span>
+                <span className="text-white font-medium">{user.username}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">이메일</span>
