@@ -48,7 +48,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       request as any
     )
 
-    return ApiResponse.success(rating, '평점이 등록되었습니다.')
+    return ApiResponse.success({
+      rating,
+      message: '평점이 등록되었습니다.'
+    })
   } catch (error) {
     console.error('Create rating error:', error)
     return ApiResponse.error(error)

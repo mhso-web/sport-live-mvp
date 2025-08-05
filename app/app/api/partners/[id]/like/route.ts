@@ -39,10 +39,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const result = await partnerService.toggleLike(partnerId, request as any)
 
-    return ApiResponse.success(
-      result,
-      result.liked ? '좋아요를 눌렀습니다.' : '좋아요를 취소했습니다.'
-    )
+    return ApiResponse.success({
+      ...result,
+      message: result.liked ? '좋아요를 눌렀습니다.' : '좋아요를 취소했습니다.'
+    })
   } catch (error) {
     console.error('Toggle like error:', error)
     return ApiResponse.error(error)
