@@ -26,7 +26,7 @@ export interface DashboardStats {
 export interface RecentUser {
   id: number
   email: string
-  nickname: string
+  username: string
   role: string
   createdAt: Date
   level: number
@@ -98,7 +98,7 @@ export class AdminStatsService {
       prisma.userExperienceLog.count({
         where: {
           createdAt: { gte: today },
-          action: 'daily_login'
+          actionType: 'daily_login'
         }
       }),
       prisma.comment.count({
@@ -143,7 +143,7 @@ export class AdminStatsService {
       select: {
         id: true,
         email: true,
-        nickname: true,
+        username: true,
         role: true,
         createdAt: true,
         level: true
@@ -164,9 +164,9 @@ export class AdminStatsService {
         id: true,
         title: true,
         createdAt: true,
-        viewCount: true,
-        author: {
-          select: { nickname: true }
+        views: true,
+        user: {
+          select: { username: true }
         },
         category: {
           select: { name: true }
@@ -177,10 +177,10 @@ export class AdminStatsService {
     return posts.map(post => ({
       id: post.id,
       title: post.title,
-      authorNickname: post.author.nickname,
-      categoryName: post.category.name,
+      authorNickname: post.user.username,
+      categoryName: post.category?.name || '',
       createdAt: post.createdAt,
-      viewCount: post.viewCount
+      viewCount: post.views
     }))
   }
 

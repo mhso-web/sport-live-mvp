@@ -55,7 +55,7 @@ export default function UserManagementContent() {
   }
 
   const handleToggleStatus = async (user: AdminUser) => {
-    if (!confirm(`${user.nickname}님의 상태를 ${user.isActive ? '비활성화' : '활성화'}하시겠습니까?`)) {
+    if (!confirm(`${user.username}님의 상태를 ${user.isActive ? '비활성화' : '활성화'}하시겠습니까?`)) {
       return
     }
 
@@ -188,8 +188,8 @@ export default function UserManagementContent() {
           >
             <option value="createdAt-desc">최근 가입순</option>
             <option value="createdAt-asc">오래된 가입순</option>
-            <option value="nickname-asc">닉네임 오름차순</option>
-            <option value="nickname-desc">닉네임 내림차순</option>
+            <option value="username-asc">닉네임 오름차순</option>
+            <option value="username-desc">닉네임 내림차순</option>
             <option value="level-desc">레벨 높은순</option>
             <option value="level-asc">레벨 낮은순</option>
             <option value="lastLoginAt-desc">최근 접속순</option>
@@ -227,7 +227,7 @@ export default function UserManagementContent() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className={`font-medium ${getLevelColor(user.level)}`}>
-                        {user.nickname}
+                        {user.username}
                       </span>
                     </div>
                   </td>

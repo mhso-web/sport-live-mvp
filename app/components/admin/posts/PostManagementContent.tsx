@@ -278,9 +278,9 @@ export default function PostManagementContent() {
               >
                 <option value="createdAt-desc">최신순</option>
                 <option value="createdAt-asc">오래된순</option>
-                <option value="viewCount-desc">조회수 많은순</option>
-                <option value="likeCount-desc">좋아요 많은순</option>
-                <option value="commentCount-desc">댓글 많은순</option>
+                <option value="views-desc">조회수 많은순</option>
+                <option value="likesCount-desc">좋아요 많은순</option>
+                <option value="commentsCount-desc">댓글 많은순</option>
               </select>
 
               {/* 필터 초기화 */}
@@ -329,8 +329,8 @@ export default function PostManagementContent() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-sm">
-                          <p className="text-white">{post.author.nickname}</p>
-                          <p className="text-gray-500">{post.author.email}</p>
+                          <p className="text-white">{post.user.username}</p>
+                          <p className="text-gray-500">{post.user.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">
@@ -340,7 +340,7 @@ export default function PostManagementContent() {
                         <div className="flex items-center gap-3">
                           <span className="flex items-center gap-1">
                             <FaEye className="w-3 h-3" />
-                            {post.viewCount}
+                            {post.views}
                           </span>
                           <span className="flex items-center gap-1">
                             <FaHeart className="w-3 h-3" />
@@ -356,7 +356,7 @@ export default function PostManagementContent() {
                         {format(new Date(post.createdAt), 'yyyy.MM.dd', { locale: ko })}
                       </td>
                       <td className="px-4 py-3">
-                        {post.isHidden ? (
+                        {post.isDeleted ? (
                           <span className="px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded-full">
                             숨김
                           </span>
@@ -379,13 +379,13 @@ export default function PostManagementContent() {
                           <button
                             onClick={() => handleToggleVisibility(post)}
                             className={`p-1.5 ${
-                              post.isHidden
+                              post.isDeleted
                                 ? 'text-green-400 hover:bg-green-500/20'
                                 : 'text-orange-400 hover:bg-orange-500/20'
                             } rounded transition-colors`}
-                            title={post.isHidden ? '공개하기' : '숨기기'}
+                            title={post.isDeleted ? '공개하기' : '숨기기'}
                           >
-                            {post.isHidden ? <FaEye /> : <FaEyeSlash />}
+                            {post.isDeleted ? <FaEye /> : <FaEyeSlash />}
                           </button>
                           <button
                             onClick={() => handleDeletePost(post)}
@@ -453,7 +453,7 @@ export default function PostManagementContent() {
               >
                 <option value="createdAt-desc">최신순</option>
                 <option value="createdAt-asc">오래된순</option>
-                <option value="likeCount-desc">좋아요 많은순</option>
+                <option value="likesCount-desc">좋아요 많은순</option>
               </select>
 
               {/* 필터 초기화 */}
@@ -502,8 +502,8 @@ export default function PostManagementContent() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-sm">
-                          <p className="text-white">{comment.author.nickname}</p>
-                          <p className="text-gray-500">{comment.author.email}</p>
+                          <p className="text-white">{comment.user.username}</p>
+                          <p className="text-gray-500">{comment.user.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3">

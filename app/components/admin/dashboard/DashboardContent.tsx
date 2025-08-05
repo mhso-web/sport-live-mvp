@@ -198,7 +198,7 @@ export default function DashboardContent({ userRole }: DashboardContentProps) {
                 <div key={user.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-white">{user.nickname}</span>
+                      <span className="font-medium text-white">{user.username}</span>
                       <span className="text-xs px-2 py-0.5 bg-gray-800 rounded text-gray-400">
                         Lv.{user.level}
                       </span>

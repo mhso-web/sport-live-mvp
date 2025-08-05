@@ -8,7 +8,7 @@ export const UserFiltersDto = z.object({
   status: z.enum(['ALL', 'ACTIVE', 'INACTIVE']).optional(),
   levelMin: z.number().optional(),
   levelMax: z.number().optional(),
-  orderBy: z.enum(['createdAt', 'nickname', 'level', 'lastLoginAt']).default('createdAt'),
+  orderBy: z.enum(['createdAt', 'username', 'level', 'lastLoginAt']).default('createdAt'),
   order: z.enum(['asc', 'desc']).default('desc'),
   page: z.number().default(1),
   limit: z.number().default(20)
@@ -24,7 +24,7 @@ export const UpdateUserRoleDto = z.object({
 export interface AdminUser {
   id: number
   email: string
-  nickname: string
+  username: string
   role: string
   level: number
   experience: number
@@ -51,7 +51,7 @@ export class AdminUserService {
     // 검색어 처리
     if (search) {
       where.OR = [
-        { nickname: { contains: search, mode: 'insensitive' } },
+        { username: { contains: search, mode: 'insensitive' } },
         { email: { contains: search, mode: 'insensitive' } }
       ]
     }
@@ -87,7 +87,7 @@ export class AdminUserService {
         select: {
           id: true,
           email: true,
-          nickname: true,
+          username: true,
           role: true,
           level: true,
           experience: true,
@@ -149,19 +149,19 @@ export class AdminUserService {
     const [recentPosts, recentComments, totalViews] = await Promise.all([
       prisma.post.count({
         where: {
-          authorId: userId,
+          userId: userId,
           createdAt: { gte: lastMonth }
         }
       }),
       prisma.comment.count({
         where: {
-          authorId: userId,
+          userId: userId,
           createdAt: { gte: lastMonth }
         }
       }),
       prisma.post.aggregate({
-        where: { authorId: userId },
-        _sum: { viewCount: true }
+        where: { userId: userId },
+        _sum: { views: true }
       })
     ])
 
@@ -170,7 +170,7 @@ export class AdminUserService {
       stats: {
         recentPosts,
         recentComments,
-        totalViews: totalViews._sum.viewCount || 0
+        totalViews: totalViews._sum.views || 0
       }
     }
   }

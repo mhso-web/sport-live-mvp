@@ -5,9 +5,9 @@ import { z } from 'zod'
 export const PostFiltersDto = z.object({
   search: z.string().optional(),
   categoryId: z.number().optional(),
-  authorId: z.number().optional(),
-  isHidden: z.boolean().optional(),
-  orderBy: z.enum(['createdAt', 'viewCount', 'likeCount', 'commentCount']).default('createdAt'),
+  userId: z.number().optional(),
+  isDeleted: z.boolean().optional(),
+  orderBy: z.enum(['createdAt', 'views', 'likesCount', 'commentsCount']).default('createdAt'),
   order: z.enum(['asc', 'desc']).default('desc'),
   page: z.number().default(1),
   limit: z.number().default(20)
@@ -19,8 +19,8 @@ export type PostFilters = z.infer<typeof PostFiltersDto>
 export const CommentFiltersDto = z.object({
   search: z.string().optional(),
   postId: z.number().optional(),
-  authorId: z.number().optional(),
-  orderBy: z.enum(['createdAt', 'likeCount']).default('createdAt'),
+  userId: z.number().optional(),
+  orderBy: z.enum(['createdAt', 'likesCount']).default('createdAt'),
   order: z.enum(['asc', 'desc']).default('desc'),
   page: z.number().default(1),
   limit: z.number().default(20)
@@ -32,12 +32,12 @@ export interface AdminPost {
   id: number
   title: string
   content: string
-  viewCount: number
-  isHidden: boolean
+  views: number
+  isDeleted: boolean
   createdAt: Date
-  author: {
+  user: {
     id: number
-    nickname: string
+    username: string
     email: string
   }
   category: {
@@ -54,9 +54,9 @@ export interface AdminComment {
   id: number
   content: string
   createdAt: Date
-  author: {
+  user: {
     id: number
-    nickname: string
+    username: string
     email: string
   }
   post: {
@@ -78,7 +78,7 @@ export class AdminPostService {
    * 게시글 목록 조회
    */
   static async findManyPosts(filters: PostFilters) {
-    const { search, categoryId, authorId, isHidden, orderBy, order, page, limit } = filters
+    const { search, categoryId, userId, isDeleted, orderBy, order, page, limit } = filters
     const offset = (page - 1) * limit
 
     // 검색 조건 구성
@@ -95,24 +95,24 @@ export class AdminPostService {
       where.categoryId = categoryId
     }
 
-    if (authorId) {
-      where.authorId = authorId
+    if (userId) {
+      where.userId = userId
     }
 
-    if (isHidden !== undefined) {
-      where.isHidden = isHidden
+    if (isDeleted !== undefined) {
+      where.isDeleted = isDeleted
     }
 
     // 정렬 옵션
     let orderByClause: any = {}
     
-    if (orderBy === 'likeCount') {
+    if (orderBy === 'likesCount') {
       // 좋아요 수로 정렬하려면 특별한 처리 필요
       const posts = await prisma.post.findMany({
         where,
         include: {
-          author: {
-            select: { id: true, nickname: true, email: true }
+          user: {
+            select: { id: true, username: true, email: true }
           },
           category: {
             select: { id: true, name: true }
@@ -145,13 +145,13 @@ export class AdminPostService {
           totalPages: Math.ceil(total / limit)
         }
       }
-    } else if (orderBy === 'commentCount') {
+    } else if (orderBy === 'commentsCount') {
       // 댓글 수로 정렬
       const posts = await prisma.post.findMany({
         where,
         include: {
-          author: {
-            select: { id: true, nickname: true, email: true }
+          user: {
+            select: { id: true, username: true, email: true }
           },
           category: {
             select: { id: true, name: true }
@@ -193,8 +193,8 @@ export class AdminPostService {
           skip: offset,
           take: limit,
           include: {
-            author: {
-              select: { id: true, nickname: true, email: true }
+            user: {
+              select: { id: true, username: true, email: true }
             },
             category: {
               select: { id: true, name: true }
@@ -226,7 +226,7 @@ export class AdminPostService {
    * 댓글 목록 조회
    */
   static async findManyComments(filters: CommentFilters) {
-    const { search, postId, authorId, orderBy, order, page, limit } = filters
+    const { search, postId, userId, orderBy, order, page, limit } = filters
     const offset = (page - 1) * limit
 
     // 검색 조건 구성
@@ -240,20 +240,20 @@ export class AdminPostService {
       where.postId = postId
     }
 
-    if (authorId) {
-      where.authorId = authorId
+    if (userId) {
+      where.userId = userId
     }
 
     // 정렬 옵션
     let orderByClause: any = {}
     
-    if (orderBy === 'likeCount') {
+    if (orderBy === 'likesCount') {
       // 좋아요 수로 정렬
       const comments = await prisma.comment.findMany({
         where,
         include: {
-          author: {
-            select: { id: true, nickname: true, email: true }
+          user: {
+            select: { id: true, username: true, email: true }
           },
           post: {
             select: { id: true, title: true }
@@ -297,8 +297,8 @@ export class AdminPostService {
           skip: offset,
           take: limit,
           include: {
-            author: {
-              select: { id: true, nickname: true, email: true }
+            user: {
+              select: { id: true, username: true, email: true }
             },
             post: {
               select: { id: true, title: true }
@@ -372,7 +372,7 @@ export class AdminPostService {
 
     const updatedPost = await prisma.post.update({
       where: { id: postId },
-      data: { isHidden: !post.isHidden }
+      data: { isDeleted: !post.isDeleted }
     })
 
     return updatedPost
