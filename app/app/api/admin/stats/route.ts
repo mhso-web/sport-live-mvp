@@ -43,6 +43,6 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error('관리자 통계 조회 오류:', error)
-    return ApiResponse.error('통계 조회에 실패했습니다')
+    return ApiResponse.error('통계 조회에 실패했습니다', 500)
   }
 }

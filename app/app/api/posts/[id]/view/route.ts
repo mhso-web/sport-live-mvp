@@ -1,4 +1,6 @@
 import { NextRequest } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth.config'
 import { prisma } from '@/lib/prisma'
 import { ExperienceService } from '@/lib/services/experienceService'
 import { ApiResponse } from '@/lib/utils/apiResponse'
@@ -14,6 +16,32 @@ export async function POST(
     const id = parseInt(params.id)
     if (isNaN(id)) {
       throw new BadRequestException('잘못된 게시글 ID입니다')
+    }
+
+    // 현재 사용자 정보 가져오기
+    const session = await getServerSession(authOptions)
+    const userId = session?.user ? parseInt(session.user.id) : null
+
+    // 먼저 게시글 정보를 가져옴
+    const existingPost = await prisma.post.findUnique({
+      where: { id },
+      select: { 
+        userId: true, 
+        views: true,
+        isDeleted: true
+      }
+    })
+
+    if (!existingPost || existingPost.isDeleted) {
+      throw new NotFoundException('게시글')
+    }
+
+    // 본인이 작성한 글인 경우 조회수를 증가시키지 않음
+    if (userId && existingPost.userId === userId) {
+      return ApiResponse.success({ 
+        views: existingPost.views,
+        isOwnPost: true 
+      })
     }
 
     // 조회수 증가
@@ -42,7 +70,10 @@ export async function POST(
       })
     }
 
-    return ApiResponse.success({ views: post.views })
+    return ApiResponse.success({ 
+      views: post.views,
+      isOwnPost: false 
+    })
   } catch (error: any) {
     // Prisma P2025 에러는 레코드를 찾을 수 없을 때 발생
     if (error.code === 'P2025') {

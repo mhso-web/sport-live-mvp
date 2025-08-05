@@ -5,6 +5,7 @@ import { FaSearch, FaEdit, FaPowerOff, FaCheckCircle, FaTimesCircle, FaInfoCircl
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import UserEditModal from './UserEditModal'
+import UserDetailModal from './UserDetailModal'
 import Pagination from '@/components/common/Pagination'
 import type { AdminUser } from '@/services/admin/adminUserService'
 
@@ -21,6 +22,7 @@ export default function UserManagementContent() {
   const [total, setTotal] = useState(0)
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showDetailModal, setShowDetailModal] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -279,7 +281,7 @@ export default function UserManagementContent() {
                       <button
                         onClick={() => {
                           setSelectedUser(user)
-                          // 상세 정보 모달 표시 (추후 구현)
+                          setShowDetailModal(true)
                         }}
                         className="p-1.5 text-gray-400 hover:bg-gray-700 rounded transition-colors"
                         title="상세정보"
@@ -324,6 +326,17 @@ export default function UserManagementContent() {
             setShowEditModal(false)
             setSelectedUser(null)
             fetchUsers()
+          }}
+        />
+      )}
+
+      {/* 사용자 상세 정보 모달 */}
+      {showDetailModal && selectedUser && (
+        <UserDetailModal
+          user={selectedUser}
+          onClose={() => {
+            setShowDetailModal(false)
+            setSelectedUser(null)
           }}
         />
       )}

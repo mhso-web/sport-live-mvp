@@ -8,6 +8,7 @@ import { ko } from 'date-fns/locale'
 import { useSession } from 'next-auth/react'
 import PostSearch from '@/components/posts/PostSearch'
 import Pagination from '@/components/ui/Pagination'
+import ViewCountDisplay from '@/components/posts/ViewCountDisplay'
 import { getLevelColorClass, getPostBorderClass } from '@/lib/utils/levelUtils'
 
 interface Post {
@@ -301,7 +302,7 @@ export default function PostListContent() {
                         <span>•</span>
                         <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: ko })}</span>
                         <span>•</span>
-                        <span>조회 {post.stats.views}</span>
+                        <ViewCountDisplay postId={post.id} initialViews={post.stats.views} />
                         {post.stats.comments > 0 && (
                           <>
                             <span>•</span>

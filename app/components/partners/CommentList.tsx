@@ -35,6 +35,26 @@ export default function CommentList({
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(initialComments.length < totalComments)
 
+  // Fetch fresh comments on mount (when key changes, component remounts)
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/partners/${partnerId}/comments?page=1`)
+        const data = await response.json()
+        
+        if (data.success) {
+          setComments(data.data.data)
+          setPage(1)
+          setHasMore(data.data.meta.hasNext)
+        }
+      } catch (error) {
+        console.error('Failed to fetch comments:', error)
+      }
+    }
+    
+    fetchComments()
+  }, [partnerId])
+
   const loadMoreComments = async () => {
     if (isLoading || !hasMore) return
 

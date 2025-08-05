@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import type { AdminUser } from '@/services/admin/adminUserService'
 
@@ -13,6 +13,18 @@ interface UserEditModalProps {
 export default function UserEditModal({ user, onClose, onSuccess }: UserEditModalProps) {
   const [selectedRole, setSelectedRole] = useState(user.role)
   const [loading, setLoading] = useState(false)
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !loading) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose, loading])
 
   const handleUpdateRole = async () => {
     if (selectedRole === user.role) {

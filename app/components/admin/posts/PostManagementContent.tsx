@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FaSearch, FaTrash, FaEye, FaEyeSlash, FaComment, FaHeart, FaExternalLinkAlt } from 'react-icons/fa'
+import { FaSearch, FaTrash, FaEye, FaEyeSlash, FaComment, FaHeart, FaExternalLinkAlt, FaSync } from 'react-icons/fa'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import Link from 'next/link'
@@ -232,7 +232,7 @@ export default function PostManagementContent() {
         <>
           {/* 게시글 필터 */}
           <div className="bg-gray-900 rounded-lg p-4 mb-6 border border-gray-800">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               {/* 검색 */}
               <div className="relative">
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -295,6 +295,17 @@ export default function PostManagementContent() {
                 className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
               >
                 초기화
+              </button>
+
+              {/* 새로고침 버튼 */}
+              <button
+                onClick={fetchPosts}
+                disabled={loading}
+                className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                title="데이터 새로고침"
+              >
+                <FaSync className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                새로고침
               </button>
             </div>
           </div>
@@ -369,7 +380,7 @@ export default function PostManagementContent() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <Link
-                            href={`/boards/${post.category.id}/${post.id}`}
+                            href={`/posts/${post.category?.slug || 'general'}/${post.id}`}
                             target="_blank"
                             className="p-1.5 text-blue-400 hover:bg-blue-500/20 rounded transition-colors"
                             title="게시글 보기"

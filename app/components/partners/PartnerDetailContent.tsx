@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import RatingModal from './RatingModal'
+import RatingStats from './RatingStats'
 import CommentForm from './CommentForm'
 import CommentList from './CommentList'
 import PartnerLikeButton from './PartnerLikeButton'
@@ -15,22 +16,6 @@ export default function PartnerDetailContent({ partner }: PartnerDetailContentPr
   const [showRatingModal, setShowRatingModal] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const renderStars = (rating: number) => {
-    const stars = []
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 !== 0
-
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        stars.push(<span key={i} className="text-gold-500">★</span>)
-      } else if (i === fullStars && hasHalfStar) {
-        stars.push(<span key={i} className="text-gold-500">☆</span>)
-      } else {
-        stars.push(<span key={i} className="text-gray-600">★</span>)
-      }
-    }
-    return stars
-  }
 
   const handleRatingSuccess = () => {
     setRefreshKey(prev => prev + 1)
@@ -140,17 +125,12 @@ export default function PartnerDetailContent({ partner }: PartnerDetailContentPr
               {/* 평점 카드 */}
               <div className="bg-dark-800 rounded-lg border border-dark-700 p-6">
                 <h3 className="text-lg font-semibold text-gray-100 mb-4">평점</h3>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-gold-500 mb-2">
-                    {partner.avgRating.toFixed(1)}
-                  </div>
-                  <div className="flex justify-center mb-2">
-                    {renderStars(partner.avgRating)}
-                  </div>
-                  <p className="text-sm text-gray-400">
-                    {partner.totalRatings}명이 평가
-                  </p>
-                </div>
+                <RatingStats
+                  partnerId={partner.id}
+                  initialAvgRating={partner.avgRating}
+                  initialTotalRatings={partner.totalRatings}
+                  refreshKey={refreshKey}
+                />
               </div>
 
               {/* 통계 카드 */}

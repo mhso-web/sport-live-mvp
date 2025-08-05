@@ -52,6 +52,12 @@ export default function CommentLikeButton({ commentId, initialLikesCount }: Comm
       if (data.success) {
         setLiked(data.data.liked)
         setLikesCount(data.data.likesCount)
+      } else {
+        // 에러 처리
+        if (data.error?.message) {
+          // 자신의 댓글 좋아요 시도 등의 에러 메시지 표시
+          alert(data.error.message)
+        }
       }
     } catch (error) {
       console.error('Failed to toggle comment like:', error)

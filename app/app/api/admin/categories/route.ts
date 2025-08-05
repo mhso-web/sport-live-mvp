@@ -19,6 +19,6 @@ export async function GET(request: NextRequest) {
     return ApiResponse.success(categories)
   } catch (error) {
     console.error('카테고리 조회 오류:', error)
-    return ApiResponse.error('카테고리 조회에 실패했습니다')
+    return ApiResponse.error('카테고리 조회에 실패했습니다', 500)
   }
 }

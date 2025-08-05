@@ -60,6 +60,12 @@ export default function LikeButton({ postId, initialLikesCount, size = 'md' }: L
         if (data.userLevel || data.userExperience) {
           await updateUserLevel()
         }
+      } else {
+        // 에러 처리
+        if (data.error?.message) {
+          // 자신의 게시글 좋아요 시도 등의 에러 메시지 표시
+          alert(data.error.message)
+        }
       }
     } catch (error) {
       console.error('Failed to toggle like:', error)

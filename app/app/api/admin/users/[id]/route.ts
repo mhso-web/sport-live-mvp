@@ -27,6 +27,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return ApiResponse.success(user)
   } catch (error) {
     console.error('사용자 조회 오류:', error)
-    return ApiResponse.error('사용자 조회에 실패했습니다')
+    return ApiResponse.error('사용자 조회에 실패했습니다', 500)
   }
 }

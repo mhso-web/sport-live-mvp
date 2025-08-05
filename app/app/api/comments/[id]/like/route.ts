@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth.config'
 import { prisma } from '@/lib/prisma'
 import { ExperienceService } from '@/lib/services/experienceService'
 import { ApiResponse } from '@/lib/utils/apiResponse'
-import { UnauthorizedException, NotFoundException } from '@/lib/errors'
+import { UnauthorizedException, NotFoundException, BadRequestException } from '@/lib/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +31,11 @@ export async function POST(
 
       if (!comment) {
         throw new NotFoundException('댓글')
+      }
+
+      // Check if it's own comment
+      if (comment.userId === userId) {
+        throw new BadRequestException('자신의 댓글에는 좋아요를 할 수 없습니다')
       }
 
       // Check if already liked

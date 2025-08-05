@@ -31,6 +31,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     })
   } catch (error: any) {
     console.error('게시글 가시성 변경 오류:', error)
-    return ApiResponse.error(error.message || '가시성 변경에 실패했습니다')
+    return ApiResponse.error(error.message || '가시성 변경에 실패했습니다', 500)
   }
 }

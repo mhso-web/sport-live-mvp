@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import PostViewCounter from '@/components/posts/PostViewCounter'
+import ViewCountDisplay from '@/components/posts/ViewCountDisplay'
 import PostActions from '@/components/posts/PostActions'
 import CommentSection from '@/components/posts/CommentSection'
 import LikeButton from '@/components/posts/LikeButton'
@@ -228,7 +229,7 @@ export default async function PostDetailPage({ params }: Props) {
                         {formatDistanceToNow(post.createdAt, { addSuffix: true, locale: ko })}
                       </time>
                       <span>•</span>
-                      <span>조회 {post.views.toLocaleString()}</span>
+                      <ViewCountDisplay postId={post.id} initialViews={post.views} />
                       <span>•</span>
                       <span>댓글 {post._count.comments}</span>
                       <span>•</span>

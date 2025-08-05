@@ -31,7 +31,9 @@ export interface AdminUser {
   experience: number
   isActive: boolean
   createdAt: Date
+  updatedAt: Date
   lastLoginAt: Date | null
+  bio: string | null
   _count: {
     posts: number
     comments: number
@@ -94,7 +96,9 @@ export class AdminUserService {
           experience: true,
           isActive: true,
           createdAt: true,
+          updatedAt: true,
           lastLoginAt: true,
+          bio: true,
           _count: {
             select: {
               posts: true,

@@ -28,6 +28,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return ApiResponse.success({ message: '댓글이 삭제되었습니다' })
   } catch (error) {
     console.error('댓글 삭제 오류:', error)
-    return ApiResponse.error('댓글 삭제에 실패했습니다')
+    return ApiResponse.error('댓글 삭제에 실패했습니다', 500)
   }
 }

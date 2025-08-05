@@ -7,6 +7,17 @@ export default withAuth(
     const isAuth = !!token
     const isAuthPage = req.nextUrl.pathname.startsWith('/login') || 
                       req.nextUrl.pathname.startsWith('/register')
+    const isAdminPage = req.nextUrl.pathname.startsWith('/admin')
+
+    // 관리자 페이지 처리
+    if (isAdminPage) {
+      // 캐시 방지 헤더 설정
+      const response = NextResponse.next()
+      response.headers.set('Cache-Control', 'no-store, must-revalidate')
+      response.headers.set('Pragma', 'no-cache')
+      response.headers.set('Expires', '0')
+      return response
+    }
 
     if (isAuthPage) {
       if (isAuth) {

@@ -32,6 +32,6 @@ export async function GET(request: NextRequest) {
     return ApiResponse.success(result)
   } catch (error) {
     console.error('댓글 목록 조회 오류:', error)
-    return ApiResponse.error('댓글 목록 조회에 실패했습니다')
+    return ApiResponse.error('댓글 목록 조회에 실패했습니다', 500)
   }
 }

@@ -115,7 +115,7 @@ export class AdminPostService {
             select: { id: true, username: true, email: true }
           },
           category: {
-            select: { id: true, name: true }
+            select: { id: true, name: true, slug: true }
           },
           _count: {
             select: {
@@ -154,7 +154,7 @@ export class AdminPostService {
             select: { id: true, username: true, email: true }
           },
           category: {
-            select: { id: true, name: true }
+            select: { id: true, name: true, slug: true }
           },
           _count: {
             select: {
@@ -197,7 +197,7 @@ export class AdminPostService {
               select: { id: true, username: true, email: true }
             },
             category: {
-              select: { id: true, name: true }
+              select: { id: true, name: true, slug: true }
             },
             _count: {
               select: {
