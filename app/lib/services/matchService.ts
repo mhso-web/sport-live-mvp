@@ -28,8 +28,9 @@ export class MatchService {
    * Get matches for a specific month
    */
   async getMatchesByMonth(year: number, month: number) {
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0, 23, 59, 59);
+    // Use UTC dates to avoid timezone issues
+    const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59));
 
     const matches = await prisma.match.findMany({
       where: {
@@ -51,11 +52,9 @@ export class MatchService {
    * Get matches for a specific date
    */
   async getMatchesByDate(date: Date) {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // Use UTC dates to avoid timezone issues
+    const startOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0));
+    const endOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
 
     const matches = await prisma.match.findMany({
       where: {

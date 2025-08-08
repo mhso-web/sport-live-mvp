@@ -7,10 +7,11 @@ export class HomeService {
    * 오늘의 경기 일정 가져오기
    */
   static async getTodayMatches() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Use UTC dates to avoid timezone issues
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 
     return await prisma.match.findMany({
       where: {
@@ -36,10 +37,11 @@ export class HomeService {
    * 오늘의 경기 분석 가져오기
    */
   static async getTodayAnalysis() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Use UTC dates to avoid timezone issues
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 
     const analyses = await prisma.sportAnalysis.findMany({
       where: {
