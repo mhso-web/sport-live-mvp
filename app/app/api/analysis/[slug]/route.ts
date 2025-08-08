@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth.config';
+import { PrismaClient } from '@prisma/client';
 import { AnalysisService } from '@/lib/services/analysisService';
 import { ApiResponse } from '@/lib/api-response';
+
+const prisma = new PrismaClient();
 
 // GET /api/analysis/[slug] - Get analysis by slug
 export async function GET(
@@ -124,10 +129,3 @@ export async function DELETE(
     return ApiResponse.internalError('Failed to delete analysis');
   }
 }
-
-// Import dependencies at the top (was missing)
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth.config';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
