@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { BADGE_TYPES, type BadgeType } from '@/lib/constants/badges'
 import type { UserBadge } from '@prisma/client'
+import { BADGE_THRESHOLDS } from '@/lib/constants/app.constants'
 
 export class BadgeService {
   // 사용자의 모든 뱃지 조회
@@ -57,13 +58,13 @@ export class BadgeService {
     if (postCount >= 1 && !(await this.hasBadge(userId, BADGE_TYPES.FIRST_POST))) {
       badgesToAward.push(BADGE_TYPES.FIRST_POST)
     }
-    if (postCount >= 10 && !(await this.hasBadge(userId, BADGE_TYPES.POST_10))) {
+    if (postCount >= BADGE_THRESHOLDS.POST_COUNT.FIRST_TIER && !(await this.hasBadge(userId, BADGE_TYPES.POST_10))) {
       badgesToAward.push(BADGE_TYPES.POST_10)
     }
     if (postCount >= 50 && !(await this.hasBadge(userId, BADGE_TYPES.POST_50))) {
       badgesToAward.push(BADGE_TYPES.POST_50)
     }
-    if (postCount >= 100 && !(await this.hasBadge(userId, BADGE_TYPES.POST_100))) {
+    if (postCount >= BADGE_THRESHOLDS.POST_COUNT.SECOND_TIER && !(await this.hasBadge(userId, BADGE_TYPES.POST_100))) {
       badgesToAward.push(BADGE_TYPES.POST_100)
     }
 
@@ -85,13 +86,13 @@ export class BadgeService {
     if (commentCount >= 1 && !(await this.hasBadge(userId, BADGE_TYPES.FIRST_COMMENT))) {
       badgesToAward.push(BADGE_TYPES.FIRST_COMMENT)
     }
-    if (commentCount >= 10 && !(await this.hasBadge(userId, BADGE_TYPES.COMMENT_10))) {
+    if (commentCount >= BADGE_THRESHOLDS.COMMENT_COUNT.FIRST_TIER && !(await this.hasBadge(userId, BADGE_TYPES.COMMENT_10))) {
       badgesToAward.push(BADGE_TYPES.COMMENT_10)
     }
     if (commentCount >= 50 && !(await this.hasBadge(userId, BADGE_TYPES.COMMENT_50))) {
       badgesToAward.push(BADGE_TYPES.COMMENT_50)
     }
-    if (commentCount >= 100 && !(await this.hasBadge(userId, BADGE_TYPES.COMMENT_100))) {
+    if (commentCount >= BADGE_THRESHOLDS.COMMENT_COUNT.SECOND_TIER && !(await this.hasBadge(userId, BADGE_TYPES.COMMENT_100))) {
       badgesToAward.push(BADGE_TYPES.COMMENT_100)
     }
 
@@ -112,13 +113,13 @@ export class BadgeService {
 
     const badgesToAward: BadgeType[] = []
 
-    if (likeCount >= 10 && !(await this.hasBadge(userId, BADGE_TYPES.LIKE_RECEIVED_10))) {
+    if (likeCount >= BADGE_THRESHOLDS.LIKE_RECEIVED.FIRST_TIER && !(await this.hasBadge(userId, BADGE_TYPES.LIKE_RECEIVED_10))) {
       badgesToAward.push(BADGE_TYPES.LIKE_RECEIVED_10)
     }
     if (likeCount >= 50 && !(await this.hasBadge(userId, BADGE_TYPES.LIKE_RECEIVED_50))) {
       badgesToAward.push(BADGE_TYPES.LIKE_RECEIVED_50)
     }
-    if (likeCount >= 100 && !(await this.hasBadge(userId, BADGE_TYPES.LIKE_RECEIVED_100))) {
+    if (likeCount >= BADGE_THRESHOLDS.LIKE_RECEIVED.SECOND_TIER && !(await this.hasBadge(userId, BADGE_TYPES.LIKE_RECEIVED_100))) {
       badgesToAward.push(BADGE_TYPES.LIKE_RECEIVED_100)
     }
 
@@ -136,10 +137,10 @@ export class BadgeService {
     if (newLevel >= 5 && !(await this.hasBadge(userId, BADGE_TYPES.LEVEL_5))) {
       badgesToAward.push(BADGE_TYPES.LEVEL_5)
     }
-    if (newLevel >= 10 && !(await this.hasBadge(userId, BADGE_TYPES.LEVEL_10))) {
+    if (newLevel >= BADGE_THRESHOLDS.LEVEL.FIRST_TIER && !(await this.hasBadge(userId, BADGE_TYPES.LEVEL_10))) {
       badgesToAward.push(BADGE_TYPES.LEVEL_10)
     }
-    if (newLevel >= 15 && !(await this.hasBadge(userId, BADGE_TYPES.LEVEL_15))) {
+    if (newLevel >= BADGE_THRESHOLDS.LEVEL.SECOND_TIER && !(await this.hasBadge(userId, BADGE_TYPES.LEVEL_15))) {
       badgesToAward.push(BADGE_TYPES.LEVEL_15)
     }
     if (newLevel >= 20 && !(await this.hasBadge(userId, BADGE_TYPES.LEVEL_20))) {
@@ -157,7 +158,7 @@ export class BadgeService {
   async checkEarlyAdopterBadge(userId: number): Promise<UserBadge | null> {
     // 전체 회원 수가 100명 이하일 때만 부여
     const userCount = await prisma.user.count()
-    if (userCount <= 100) {
+    if (userCount <= BADGE_THRESHOLDS.EARLY_ADOPTER.MAX_USERS) {
       return this.awardBadge(userId, BADGE_TYPES.EARLY_ADOPTER, { userNumber: userCount })
     }
     return null
@@ -170,7 +171,7 @@ export class BadgeService {
     if (consecutiveDays >= 7 && !(await this.hasBadge(userId, BADGE_TYPES.DAILY_LOGIN_7))) {
       badgesToAward.push(BADGE_TYPES.DAILY_LOGIN_7)
     }
-    if (consecutiveDays >= 30 && !(await this.hasBadge(userId, BADGE_TYPES.DAILY_LOGIN_30))) {
+    if (consecutiveDays >= BADGE_THRESHOLDS.DAILY_LOGIN.ACHIEVEMENT && !(await this.hasBadge(userId, BADGE_TYPES.DAILY_LOGIN_30))) {
       badgesToAward.push(BADGE_TYPES.DAILY_LOGIN_30)
     }
 

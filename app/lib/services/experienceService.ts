@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { BadgeService } from './badgeService'
+import { EXPERIENCE_POINTS } from '@/lib/constants/app.constants'
 
 export type ExperienceActionType = 
   | 'POST_CREATE'       // 게시글 작성
@@ -15,16 +16,16 @@ export type ExperienceActionType =
 
 // 경험치 테이블
 const EXPERIENCE_TABLE: Record<ExperienceActionType, number> = {
-  POST_CREATE: 10,
-  COMMENT_CREATE: 5,
+  POST_CREATE: EXPERIENCE_POINTS.POST_CREATE,
+  COMMENT_CREATE: EXPERIENCE_POINTS.COMMENT_CREATE,
   POST_LIKE: 2,
   COMMENT_LIKE: 2,
-  RECEIVED_LIKE: 3,
-  DAILY_LOGIN: 5,
+  RECEIVED_LIKE: EXPERIENCE_POINTS.LIKE_RECEIVED,
+  DAILY_LOGIN: EXPERIENCE_POINTS.DAILY_LOGIN,
   PROFILE_COMPLETE: 50,
   FIRST_POST: 20,
-  POST_VIEWS_100: 30,
-  POST_VIEWS_1000: 100,
+  POST_VIEWS_100: EXPERIENCE_POINTS.ACHIEVEMENTS.POST_VIEWS_100,
+  POST_VIEWS_1000: EXPERIENCE_POINTS.ACHIEVEMENTS.POST_VIEWS_1000,
 }
 
 // 레벨별 필요 경험치 (레벨 1->2는 100, 2->3은 200 등)

@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { authService } from '@/lib/container'
+import { getAuthService } from '@/lib/container'
 import { config } from '@/lib/config'
 import { ExperienceService } from '@/lib/services/experienceService'
 import { prisma } from '@/lib/prisma'
@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const { user } = await authService.login({
+          const { user } = await getAuthService().login({
             username: credentials.username,
             password: credentials.password
           })

@@ -41,6 +41,13 @@ model User {
   inquiries       Inquiry[]
   inquiryResponses InquiryResponse[]
   
+  // 분석가 관련
+  analystProfile  AnalystProfile?
+  sportAnalyses   SportAnalysis[]
+  analysisPredictions AnalysisPrediction[]
+  analysisComments AnalysisComment[]
+  analysisLikes   AnalysisLike[]
+  
   @@index([username])
   @@index([email])
   @@index([level])
@@ -223,6 +230,18 @@ model Match {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
   
+  // NEW: Foreign key relations (optional for backward compatibility)
+  sportId        Int?     @map("sport_id")
+  leagueId       Int?     @map("league_id")
+  homeTeamId     Int?     @map("home_team_id")
+  awayTeamId     Int?     @map("away_team_id")
+  
+  // NEW: Relations
+  sport          Sport?   @relation(fields: [sportId], references: [id])
+  leagueRef      League?  @relation(fields: [leagueId], references: [id])
+  homeTeamRef    Team?    @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeamRef    Team?    @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  
   events         MatchEvent[]
   analyses       MatchAnalysis[]
   chatMessages   ChatMessage[]
@@ -249,6 +268,7 @@ enum MatchStatus {
   LIVE @map("live")
   FINISHED @map("finished")
   CANCELLED @map("cancelled")
+  POSTPONED @map("postponed")
 }
 
 model MatchEvent {
@@ -511,4 +531,348 @@ enum InquiryStatus {
   IN_PROGRESS
   RESOLVED
   CLOSED
+}
+
+// ========== 분석가 시스템 관련 모델 ==========
+
+model AnalystProfile {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @unique @map("user_id")
+  displayName        String   @map("display_name") @db.VarChar(100)
+  profileImage       String?  @map("profile_image")
+  specialties        String[] // ['축구', 'KBO', 'NBA', '해외축구' 등]
+  description        String?  @db.Text
+  experience         String?  @db.VarChar(200) // "10년 경력 스포츠 분석가"
+  certification      String?  @db.VarChar(200) // 자격증이나 인증 정보
+  totalPredictions   Int      @default(0) @map("total_predictions")
+  correctPredictions Int      @default(0) @map("correct_predictions")
+  averageAccuracy    Decimal? @map("average_accuracy") @db.Decimal(5, 2) // 정확도 %
+  monthlyRanking     Int?     @map("monthly_ranking")
+  totalViews         Int      @default(0) @map("total_views")
+  totalLikes         Int      @default(0) @map("total_likes")
+  isVerified         Boolean  @default(false) @map("is_verified") // 검증된 분석가
+  verifiedAt         DateTime? @map("verified_at")
+  metadata           Json?    // 추가 정보 (소셜 링크 등)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([averageAccuracy(sort: Desc)])
+  @@index([totalViews(sort: Desc)])
+  @@index([monthlyRanking])
+  @@map("analyst_profiles")
+}
+
+// 스포츠 분석 게시글 (분석가 작성)
+model SportAnalysis {
+  id                 Int      @id @default(autoincrement())
+  authorId           Int      @map("author_id")
+  matchDate          DateTime @map("match_date") // 경기 날짜
+  sportType          SportType @map("sport_type")
+  league             String   @db.VarChar(100) // 리그명 (KBO, K리그, NPB 등)
+  competition        String?  @db.VarChar(100) // 대회명 (챔피언스리그, 월드컵 등)
+  homeTeam           String   @map("home_team") @db.VarChar(100)
+  awayTeam           String   @map("away_team") @db.VarChar(100)
+  
+  // SEO 최적화 필드
+  title              String   @db.VarChar(300) // SEO 타이틀
+  slug               String   @unique @db.VarChar(200) // URL slug
+  metaDescription    String?  @map("meta_description") @db.Text
+  metaKeywords       String[] @map("meta_keywords")
+  
+  // 분석 내용
+  homeFormation      String?  @map("home_formation") @db.VarChar(50) // 홈팀 포메이션
+  awayFormation      String?  @map("away_formation") @db.VarChar(50) // 원정팀 포메이션
+  homeAnalysis       String   @map("home_analysis") @db.Text // 홈팀 분석
+  awayAnalysis       String   @map("away_analysis") @db.Text // 원정팀 분석
+  tacticalAnalysis   String?  @map("tactical_analysis") @db.Text // 전술 분석
+  keyPlayers         Json?    @map("key_players") // 주요 선수 정보
+  injuryInfo         Json?    @map("injury_info") // 부상자 정보
+  headToHead         Json?    @map("head_to_head") // 상대전적
+  recentForm         Json?    @map("recent_form") // 최근 경기 결과
+  
+  // 예측 및 베팅 추천
+  predictionSummary  String   @map("prediction_summary") @db.Text // 예측 요약
+  confidenceLevel    Int      @map("confidence_level") // 1-5 신뢰도
+  
+  // 통계
+  views              Int      @default(0)
+  likes              Int      @default(0)
+  commentsCount      Int      @default(0) @map("comments_count")
+  
+  // 상태
+  status             AnalysisStatus @default(DRAFT)
+  isPublished        Boolean  @default(false) @map("is_published")
+  publishedAt        DateTime? @map("published_at")
+  isPinned           Boolean  @default(false) @map("is_pinned")
+  
+  // 결과 추적
+  actualHomeScore    Int?     @map("actual_home_score")
+  actualAwayScore    Int?     @map("actual_away_score")
+  predictionResult   PredictionResult? @map("prediction_result")
+  
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  
+  // NEW: Foreign key relations (optional for backward compatibility)
+  sportId            Int?     @map("sport_id")
+  leagueId           Int?     @map("league_id")
+  homeTeamId         Int?     @map("home_team_id")
+  awayTeamId         Int?     @map("away_team_id")
+  
+  // NEW: SEO-optimized slug
+  seoSlug            String?  @map("seo_slug") @db.VarChar(300)  // "soccer/premier-league/2025/08/liverpool-vs-bournemouth"
+  
+  // NEW: Relations
+  sport              Sport?   @relation(fields: [sportId], references: [id])
+  leagueRef          League?  @relation(fields: [leagueId], references: [id])
+  homeTeamRef        Team?    @relation("HomeTeamAnalysis", fields: [homeTeamId], references: [id])
+  awayTeamRef        Team?    @relation("AwayTeamAnalysis", fields: [awayTeamId], references: [id])
+  
+  author             User     @relation(fields: [authorId], references: [id])
+  predictions        AnalysisPrediction[]
+  comments           AnalysisComment[]
+  analysisLikes      AnalysisLike[]
+  
+  @@index([matchDate, sportType])
+  @@index([slug])
+  @@index([authorId])
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([sportType, publishedAt(sort: Desc)])
+  @@index([league, publishedAt(sort: Desc)])
+  @@index([views(sort: Desc)])
+  @@index([seoSlug])
+  @@map("sport_analyses")
+}
+
+// 베팅 예측 정보
+model AnalysisPrediction {
+  id            Int      @id @default(autoincrement())
+  analysisId    Int      @map("analysis_id")
+  authorId      Int      @map("author_id")
+  betType       BetType  @map("bet_type")
+  prediction    String   @db.VarChar(200) // "홈팀 승", "언더 2.5", "핸디캡 -1.5 홈" 등
+  odds          Decimal? @db.Decimal(5, 2) // 배당률
+  stake         Int?     // 추천 베팅 단위 (1-10)
+  reasoning     String   @db.Text // 예측 근거
+  result        PredictionResult? // 예측 결과
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  analysis      SportAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  author        User          @relation(fields: [authorId], references: [id])
+  
+  @@index([analysisId])
+  @@index([authorId])
+  @@map("analysis_predictions")
+}
+
+// 분석 댓글
+model AnalysisComment {
+  id            Int      @id @default(autoincrement())
+  analysisId    Int      @map("analysis_id")
+  userId        Int      @map("user_id")
+  parentId      Int?     @map("parent_id")
+  content       String   @db.Text
+  likes         Int      @default(0)
+  isDeleted     Boolean  @default(false) @map("is_deleted")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  analysis      SportAnalysis    @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id])
+  parent        AnalysisComment? @relation("AnalysisCommentReplies", fields: [parentId], references: [id])
+  replies       AnalysisComment[] @relation("AnalysisCommentReplies")
+  
+  @@index([analysisId, createdAt(sort: Desc)])
+  @@index([userId])
+  @@map("analysis_comments")
+}
+
+// 분석 좋아요
+model AnalysisLike {
+  id          Int      @id @default(autoincrement())
+  analysisId  Int      @map("analysis_id")
+  userId      Int      @map("user_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  analysis    SportAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id])
+  
+  @@unique([analysisId, userId])
+  @@index([analysisId])
+  @@index([userId])
+  @@map("analysis_likes")
+}
+
+// Enums for Sport Analysis
+enum AnalysisStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum BetType {
+  MATCH_RESULT   @map("match_result")    // 승무패
+  HANDICAP       @map("handicap")        // 핸디캡
+  OVER_UNDER     @map("over_under")      // 오버/언더
+  BOTH_SCORE     @map("both_score")      // 양팀득점
+  CORRECT_SCORE  @map("correct_score")   // 정확한 스코어
+  FIRST_GOAL     @map("first_goal")      // 첫 득점
+  HALF_TIME      @map("half_time")       // 전반전 결과
+  SPECIAL        @map("special")         // 특별 베팅
+}
+
+enum PredictionResult {
+  PENDING   @map("pending")
+  CORRECT   @map("correct")
+  INCORRECT @map("incorrect")
+  PARTIAL   @map("partial")   // 부분적으로 맞음
+  CANCELLED @map("cancelled") // 경기 취소
+}
+// ============================================
+// SEO-OPTIMIZED MODELS FOR HIERARCHICAL URLS
+// ============================================
+
+// Sport model - Top level entity
+model Sport {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique @db.VarChar(50)  // "soccer", "baseball", "basketball"
+  nameEn      String   @map("name_en") @db.VarChar(100)  // "Soccer", "Baseball"
+  nameKo      String   @map("name_ko") @db.VarChar(100)  // "축구", "야구"
+  icon        String?  @db.VarChar(10)  // "⚽", "⚾", "🏀"
+  orderIndex  Int      @default(0) @map("order_index")
+  isActive    Boolean  @default(true) @map("is_active")
+  
+  // SEO fields
+  description String?  @db.Text
+  keywords    String[]
+  
+  // Relations
+  leagues     League[]
+  teams       Team[]
+  matches     Match[]
+  analyses    SportAnalysis[]
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@index([slug])
+  @@map("sports")
+}
+
+// League model - Belongs to Sport
+model League {
+  id          Int      @id @default(autoincrement())
+  sportId     Int      @map("sport_id")
+  slug        String   @unique @db.VarChar(100)  // "premier-league", "k-league-1"
+  nameEn      String   @map("name_en") @db.VarChar(200)  // "Premier League"
+  nameKo      String   @map("name_ko") @db.VarChar(200)  // "프리미어리그"
+  nameLocal   String?  @map("name_local") @db.VarChar(200)  // Local language name
+  
+  country     String   @db.VarChar(2)  // ISO country code: "GB", "KR", "US"
+  tier        Int      @default(1)  // League tier/division level
+  logo        String?  // CDN URL for league logo
+  
+  // SEO fields
+  description String?  @db.Text
+  keywords    String[]
+  websiteUrl  String?  @map("website_url")
+  
+  // Season info
+  currentSeason String? @map("current_season") @db.VarChar(20)  // "2025/26"
+  
+  // Relations
+  sport       Sport    @relation(fields: [sportId], references: [id])
+  teams       TeamLeague[]
+  matches     Match[]
+  analyses    SportAnalysis[]
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@unique([sportId, slug])
+  @@index([sportId])
+  @@index([slug])
+  @@index([country])
+  @@map("leagues")
+}
+
+// Team model
+model Team {
+  id          Int      @id @default(autoincrement())
+  sportId     Int      @map("sport_id")
+  slug        String   @unique @db.VarChar(100)  // "liverpool-fc", "la-dodgers"
+  
+  // Multi-language names
+  nameEn      String   @map("name_en") @db.VarChar(200)  // "Liverpool FC"
+  nameKo      String   @map("name_ko") @db.VarChar(200)  // "리버풀 FC"
+  nameLocal   String?  @map("name_local") @db.VarChar(200)
+  shortName   String?  @map("short_name") @db.VarChar(50)  // "Liverpool"
+  abbreviation String? @db.VarChar(10)  // "LIV"
+  
+  // Team info
+  founded     Int?     // Year founded: 1892
+  country     String   @db.VarChar(2)  // ISO country code
+  city        String?  @db.VarChar(100)
+  stadium     String?  @db.VarChar(200)  // "Anfield"
+  capacity    Int?     // Stadium capacity
+  
+  // Media
+  logo        String?  // CDN URL for team logo
+  primaryColor String? @map("primary_color") @db.VarChar(7)  // "#C8102E"
+  secondaryColor String? @map("secondary_color") @db.VarChar(7)
+  
+  // SEO & Social
+  description String?  @db.Text
+  keywords    String[]
+  websiteUrl  String?  @map("website_url")
+  socialMedia Json?    @map("social_media")  // {twitter: "", instagram: "", etc}
+  
+  // Relations
+  sport       Sport    @relation(fields: [sportId], references: [id])
+  leagues     TeamLeague[]
+  homeMatches Match[]  @relation("HomeTeam")
+  awayMatches Match[]  @relation("AwayTeam")
+  homeAnalyses SportAnalysis[] @relation("HomeTeamAnalysis")
+  awayAnalyses SportAnalysis[] @relation("AwayTeamAnalysis")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@index([sportId])
+  @@index([slug])
+  @@index([country])
+  @@map("teams")
+}
+
+// Team-League relationship (Many-to-Many with season)
+model TeamLeague {
+  id          Int      @id @default(autoincrement())
+  teamId      Int      @map("team_id")
+  leagueId    Int      @map("league_id")
+  season      String   @db.VarChar(20)  // "2025/26"
+  
+  // Optional season-specific data
+  position    Int?     // Current league position
+  played      Int?     @default(0)
+  won         Int?     @default(0)
+  drawn       Int?     @default(0)
+  lost        Int?     @default(0)
+  points      Int?     @default(0)
+  
+  isActive    Boolean  @default(true) @map("is_active")
+  
+  // Relations
+  team        Team     @relation(fields: [teamId], references: [id])
+  league      League   @relation(fields: [leagueId], references: [id])
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@unique([teamId, leagueId, season])
+  @@index([teamId])
+  @@index([leagueId])
+  @@index([season])
+  @@map("team_leagues")
 }

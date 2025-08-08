@@ -7,6 +7,7 @@ import { BadgeService } from '@/lib/services/badgeService'
 import { ConflictException, UnauthorizedException, ValidationError } from '@/lib/errors'
 import { config } from '@/lib/config'
 import type { User } from '@prisma/client'
+import { AUTH_CONSTANTS, API_MESSAGES } from '@/lib/constants/app.constants'
 
 export interface AuthTokenPayload {
   userId: number
@@ -49,7 +50,7 @@ export class AuthService {
     }
 
     // 4. 비밀번호 해싱
-    const hashedPassword = await bcrypt.hash(validated.password, 10)
+    const hashedPassword = await bcrypt.hash(validated.password, AUTH_CONSTANTS.BCRYPT_ROUNDS)
 
     // 5. 사용자 생성
     const user = await this.userRepository.create({
@@ -83,13 +84,13 @@ export class AuthService {
     // 2. 사용자 조회 (username으로 조회)
     const user = await this.userRepository.findByUsername(validated.username)
     if (!user) {
-      throw new UnauthorizedException('사용자명 또는 비밀번호가 올바르지 않습니다')
+      throw new UnauthorizedException(API_MESSAGES.AUTH.INVALID_CREDENTIALS)
     }
 
     // 3. 비밀번호 확인
     const isPasswordValid = await bcrypt.compare(validated.password, user.passwordHash)
     if (!isPasswordValid) {
-      throw new UnauthorizedException('사용자명 또는 비밀번호가 올바르지 않습니다')
+      throw new UnauthorizedException(API_MESSAGES.AUTH.INVALID_CREDENTIALS)
     }
 
     // 4. 계정 활성 상태 확인
@@ -114,7 +115,7 @@ export class AuthService {
       const payload = jwt.verify(token, config.JWT_SECRET!) as AuthTokenPayload
       return payload
     } catch (error) {
-      throw new UnauthorizedException('유효하지 않은 토큰입니다')
+      throw new UnauthorizedException(API_MESSAGES.AUTH.UNAUTHORIZED)
     }
   }
 
@@ -131,7 +132,7 @@ export class AuthService {
     }
 
     return jwt.sign(payload, config.JWT_SECRET!, {
-      expiresIn: '7d'
+      expiresIn: AUTH_CONSTANTS.JWT_EXPIRY
     })
   }
 

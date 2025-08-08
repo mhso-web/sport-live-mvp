@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import RatingModal from './RatingModal'
 import RatingStats from './RatingStats'
 import CommentForm from './CommentForm'
@@ -58,11 +59,14 @@ export default function PartnerDetailContent({ partner }: PartnerDetailContentPr
 
           {/* 배너 이미지 */}
           {partner.bannerImage ? (
-            <div className="aspect-video bg-dark-800 rounded-lg overflow-hidden mb-8">
-              <img 
+            <div className="aspect-video bg-dark-800 rounded-lg overflow-hidden mb-8 relative">
+              <Image 
                 src={partner.bannerImage} 
-                alt={partner.name}
-                className="w-full h-full object-cover"
+                alt={`${partner.name} 배너 이미지`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                priority
               />
             </div>
           ) : (

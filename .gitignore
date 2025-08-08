@@ -36,6 +36,7 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 *.env
+.env.docker
 
 # Vercel
 .vercel
@@ -62,6 +63,8 @@ pip-delete-this-directory.txt
 *.sqlite
 *.sqlite3
 postgres_data/
+data/
+backups/
 
 # Prisma
 app/prisma/migrations/
@@ -110,3 +113,6 @@ docs/
 local-dev-guide.md
 checklist.md
 CLAUDE.md
+
+# AI Worker (Python batch processing)
+ai-worker/

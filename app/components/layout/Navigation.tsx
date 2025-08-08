@@ -151,7 +151,7 @@ export default function Navigation() {
                 href="/analysis"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-300 hover:text-gold-500 transition-colors duration-200"
               >
-                AI 분석
+                경기 분석
               </Link>
               
               <Link

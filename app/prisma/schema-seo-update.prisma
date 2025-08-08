@@ -1,0 +1,184 @@
+// NEW MODELS FOR SEO-OPTIMIZED URL STRUCTURE
+// Add these models to your existing schema.prisma file
+
+// Sport model - Top level entity
+model Sport {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique @db.VarChar(50)  // "soccer", "baseball", "basketball"
+  nameEn      String   @map("name_en") @db.VarChar(100)  // "Soccer", "Baseball"
+  nameKo      String   @map("name_ko") @db.VarChar(100)  // "축구", "야구"
+  icon        String?  @db.VarChar(10)  // "⚽", "⚾", "🏀"
+  orderIndex  Int      @default(0) @map("order_index")
+  isActive    Boolean  @default(true) @map("is_active")
+  
+  // SEO fields
+  description String?  @db.Text
+  keywords    String[]
+  
+  // Relations
+  leagues     League[]
+  teams       Team[]
+  matches     Match[]
+  analyses    SportAnalysis[]
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@index([slug])
+  @@map("sports")
+}
+
+// League model - Belongs to Sport
+model League {
+  id          Int      @id @default(autoincrement())
+  sportId     Int      @map("sport_id")
+  slug        String   @unique @db.VarChar(100)  // "premier-league", "k-league-1"
+  nameEn      String   @map("name_en") @db.VarChar(200)  // "Premier League"
+  nameKo      String   @map("name_ko") @db.VarChar(200)  // "프리미어리그"
+  nameLocal   String?  @map("name_local") @db.VarChar(200)  // Local language name
+  
+  country     String   @db.VarChar(2)  // ISO country code: "GB", "KR", "US"
+  tier        Int      @default(1)  // League tier/division level
+  logo        String?  // CDN URL for league logo
+  
+  // SEO fields
+  description String?  @db.Text
+  keywords    String[]
+  websiteUrl  String?  @map("website_url")
+  
+  // Season info
+  currentSeason String? @map("current_season") @db.VarChar(20)  // "2025/26"
+  
+  // Relations
+  sport       Sport    @relation(fields: [sportId], references: [id])
+  teams       TeamLeague[]
+  matches     Match[]
+  analyses    SportAnalysis[]
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@unique([sportId, slug])
+  @@index([sportId])
+  @@index([slug])
+  @@index([country])
+  @@map("leagues")
+}
+
+// Team model
+model Team {
+  id          Int      @id @default(autoincrement())
+  sportId     Int      @map("sport_id")
+  slug        String   @unique @db.VarChar(100)  // "liverpool-fc", "la-dodgers"
+  
+  // Multi-language names
+  nameEn      String   @map("name_en") @db.VarChar(200)  // "Liverpool FC"
+  nameKo      String   @map("name_ko") @db.VarChar(200)  // "리버풀 FC"
+  nameLocal   String?  @map("name_local") @db.VarChar(200)
+  shortName   String?  @map("short_name") @db.VarChar(50)  // "Liverpool"
+  abbreviation String? @db.VarChar(10)  // "LIV"
+  
+  // Team info
+  founded     Int?     // Year founded: 1892
+  country     String   @db.VarChar(2)  // ISO country code
+  city        String?  @db.VarChar(100)
+  stadium     String?  @db.VarChar(200)  // "Anfield"
+  capacity    Int?     // Stadium capacity
+  
+  // Media
+  logo        String?  // CDN URL for team logo
+  primaryColor String? @map("primary_color") @db.VarChar(7)  // "#C8102E"
+  secondaryColor String? @map("secondary_color") @db.VarChar(7)
+  
+  // SEO & Social
+  description String?  @db.Text
+  keywords    String[]
+  websiteUrl  String?  @map("website_url")
+  socialMedia Json?    @map("social_media")  // {twitter: "", instagram: "", etc}
+  
+  // Relations
+  sport       Sport    @relation(fields: [sportId], references: [id])
+  leagues     TeamLeague[]
+  homeMatches Match[]  @relation("HomeTeam")
+  awayMatches Match[]  @relation("AwayTeam")
+  homeAnalyses SportAnalysis[] @relation("HomeTeamAnalysis")
+  awayAnalyses SportAnalysis[] @relation("AwayTeamAnalysis")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@index([sportId])
+  @@index([slug])
+  @@index([country])
+  @@map("teams")
+}
+
+// Team-League relationship (Many-to-Many with season)
+model TeamLeague {
+  id          Int      @id @default(autoincrement())
+  teamId      Int      @map("team_id")
+  leagueId    Int      @map("league_id")
+  season      String   @db.VarChar(20)  // "2025/26"
+  
+  // Optional season-specific data
+  position    Int?     // Current league position
+  played      Int?     @default(0)
+  won         Int?     @default(0)
+  drawn       Int?     @default(0)
+  lost        Int?     @default(0)
+  points      Int?     @default(0)
+  
+  isActive    Boolean  @default(true) @map("is_active")
+  
+  // Relations
+  team        Team     @relation(fields: [teamId], references: [id])
+  league      League   @relation(fields: [leagueId], references: [id])
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@unique([teamId, leagueId, season])
+  @@index([teamId])
+  @@index([leagueId])
+  @@index([season])
+  @@map("team_leagues")
+}
+
+// UPDATE EXISTING MODELS - Add these fields to existing Match model
+// model Match {
+//   // ... existing fields ...
+//   
+//   // NEW: Foreign key relations (optional for backward compatibility)
+//   sportId      Int?     @map("sport_id")
+//   leagueId     Int?     @map("league_id")
+//   homeTeamId   Int?     @map("home_team_id")
+//   awayTeamId   Int?     @map("away_team_id")
+//   
+//   // NEW: Relations
+//   sport        Sport?   @relation(fields: [sportId], references: [id])
+//   leagueRef    League?  @relation(fields: [leagueId], references: [id])
+//   homeTeamRef  Team?    @relation("HomeTeam", fields: [homeTeamId], references: [id])
+//   awayTeamRef  Team?    @relation("AwayTeam", fields: [awayTeamId], references: [id])
+// }
+
+// UPDATE EXISTING MODELS - Add these fields to existing SportAnalysis model
+// model SportAnalysis {
+//   // ... existing fields ...
+//   
+//   // NEW: Foreign key relations (optional for backward compatibility)
+//   sportId      Int?     @map("sport_id")
+//   leagueId     Int?     @map("league_id")
+//   homeTeamId   Int?     @map("home_team_id")
+//   awayTeamId   Int?     @map("away_team_id")
+//   
+//   // NEW: SEO-optimized slug
+//   seoSlug      String?  @map("seo_slug") @db.VarChar(300)  // "soccer/premier-league/2025/08/liverpool-vs-bournemouth"
+//   
+//   // NEW: Relations
+//   sport        Sport?   @relation(fields: [sportId], references: [id])
+//   leagueRef    League?  @relation(fields: [leagueId], references: [id])
+//   homeTeamRef  Team?    @relation("HomeTeamAnalysis", fields: [homeTeamId], references: [id])
+//   awayTeamRef  Team?    @relation("AwayTeamAnalysis", fields: [awayTeamId], references: [id])
+//   
+//   @@index([seoSlug])
+// }

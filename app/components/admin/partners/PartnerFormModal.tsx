@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { FaTimes, FaUpload, FaImage } from 'react-icons/fa'
 
 interface Partner {
@@ -372,16 +373,18 @@ export default function PartnerFormModal({
             <div className="space-y-2">
               {/* 이미지 미리보기 */}
               {formData.bannerImage && (
-                <div className="relative rounded-lg overflow-hidden bg-gray-800">
-                  <img
+                <div className="relative rounded-lg overflow-hidden bg-gray-800 h-32">
+                  <Image
                     src={getImageUrl(formData.bannerImage)}
-                    alt="배너 미리보기"
-                    className="w-full h-32 object-cover"
+                    alt="보증업체 배너 이미지 미리보기"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 400px"
                   />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, bannerImage: '' })}
-                    className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 rounded-lg text-white transition-colors"
+                    className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 rounded-lg text-white transition-colors z-10"
                   >
                     <FaTimes className="w-4 h-4" />
                   </button>

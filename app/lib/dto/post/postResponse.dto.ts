@@ -7,6 +7,7 @@ export class PostResponseDto {
   summary: string | null
   views: number
   boardType: string
+  categoryId: number | null
   category: {
     id: number
     name: string
@@ -16,6 +17,13 @@ export class PostResponseDto {
     id: number
     username: string
     level: number
+  }
+  // Legacy support for edit page and detail page
+  user: {
+    id: number
+    username: string
+    level: number
+    role?: string
   }
   stats: {
     views: number
@@ -33,11 +41,19 @@ export class PostResponseDto {
     this.summary = post.summary
     this.views = post.views
     this.boardType = post.boardType
+    this.categoryId = post.categoryId
     this.category = post.category
     this.author = {
       id: post.user.id,
       username: post.user.username,
       level: post.user.level
+    }
+    // Legacy support for edit page and detail page
+    this.user = {
+      id: post.user.id,
+      username: post.user.username,
+      level: post.user.level,
+      role: (post.user as any).role
     }
     this.stats = {
       views: post.views,

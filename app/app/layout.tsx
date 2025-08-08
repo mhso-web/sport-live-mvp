@@ -7,8 +7,8 @@ import ConditionalNavigation from '@/components/layout/ConditionalNavigation'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Sports Live',
-  description: 'Real-time sports broadcasting with AI-powered analysis',
+  title: 'Sports Live - 실시간 스포츠 중계 및 경기 분석',
+  description: '실시간 스포츠 중계와 심층 경기 분석을 제공하는 스포츠 커뮤니티 플랫폼',
 }
 
 export default function RootLayout({

@@ -3,7 +3,20 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['localhost'],
+    domains: [
+      'localhost',
+      'res.cloudinary.com',
+      'images.unsplash.com',
+      'i.imgur.com',
+      'picsum.photos',
+      'via.placeholder.com',
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   async headers() {
     return [

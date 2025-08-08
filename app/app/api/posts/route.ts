@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth.config'
-import { PostService } from '@/lib/services/postService'
-import { PostRepository } from '@/lib/repositories/postRepository'
-import { BoardCategoryRepository } from '@/lib/repositories/boardCategoryRepository'
-import { UserRepository } from '@/lib/repositories/userRepository'
+import { getPostService, getUserRepository } from '@/lib/container'
 import { handleApiError } from '@/lib/errors'
 import { BoardType } from '@prisma/client'
+import { PAGINATION_DEFAULTS, API_MESSAGES } from '@/lib/constants/app.constants'
 
 export const dynamic = 'force-dynamic'
 
-const postRepository = new PostRepository()
-const boardCategoryRepository = new BoardCategoryRepository()
-const userRepository = new UserRepository()
-const postService = new PostService(postRepository, boardCategoryRepository, userRepository)
+// Get services from DI container
+const postService = getPostService()
+const userRepository = getUserRepository()
 
 // GET /api/posts - 게시글 목록 조회
 export async function GET(request: NextRequest) {
@@ -32,9 +29,9 @@ export async function GET(request: NextRequest) {
     // 페이지네이션 파라미터
     const pagination = {
       page: parseInt(searchParams.get('page') || '1'),
-      limit: parseInt(searchParams.get('limit') || '20'),
-      orderBy: searchParams.get('orderBy') || 'createdAt',
-      order: (searchParams.get('orderDir') || 'desc') as 'asc' | 'desc'
+      limit: parseInt(searchParams.get('limit') || String(PAGINATION_DEFAULTS.LIMIT)),
+      orderBy: searchParams.get('orderBy') || PAGINATION_DEFAULTS.ORDER_BY,
+      order: (searchParams.get('orderDir') || PAGINATION_DEFAULTS.ORDER_DIR) as 'asc' | 'desc'
     }
 
     const result = await postService.findAll(filters, pagination)
@@ -55,7 +52,7 @@ export async function POST(request: NextRequest) {
     
     if (!session?.user) {
       return NextResponse.json({
-        error: '로그인이 필요합니다',
+        error: API_MESSAGES.AUTH.LOGIN_REQUIRED,
         success: false
       }, { status: 401 })
     }
