@@ -39,16 +39,16 @@ export class StatsService {
       const recentMatches = await prisma.match.findMany({
         where: {
           OR: [
-            { homeTeam: { id: parseInt(teamId) } },
-            { awayTeam: { id: parseInt(teamId) } },
+            { homeTeamId: parseInt(teamId) },
+            { awayTeamId: parseInt(teamId) },
           ],
           status: 'FINISHED',
         },
         orderBy: { scheduledTime: 'desc' },
         take: 10,
         include: {
-          homeTeam: true,
-          awayTeam: true,
+          homeTeamRef: true,
+          awayTeamRef: true,
         },
       });
 
@@ -58,7 +58,7 @@ export class StatsService {
       let form = '';
 
       recentMatches.slice(0, 5).forEach(match => {
-        const isHome = match.homeTeam.id === parseInt(teamId);
+        const isHome = match.homeTeamRef?.id === parseInt(teamId);
         const scored = isHome ? match.homeScore : match.awayScore;
         const conceded = isHome ? match.awayScore : match.homeScore;
         
@@ -79,10 +79,10 @@ export class StatsService {
 
       const stats: TeamStats = {
         teamId,
-        teamName: recentMatches[0]?.homeTeam?.name || 'Unknown Team',
+        teamName: recentMatches[0]?.homeTeamRef?.nameKo || recentMatches[0]?.awayTeamRef?.nameKo || 'Unknown Team',
         recentMatches: recentMatches.slice(0, 5).map(m => ({
-          home: m.homeTeam.name,
-          away: m.awayTeam.name,
+          home: m.homeTeam,
+          away: m.awayTeam,
           homeScore: m.homeScore,
           awayScore: m.awayScore,
           date: m.scheduledTime,
@@ -131,14 +131,14 @@ export class StatsService {
           OR: [
             {
               AND: [
-                { homeTeam: { id: parseInt(homeTeamId) } },
-                { awayTeam: { id: parseInt(awayTeamId) } },
+                { homeTeamId: parseInt(homeTeamId) },
+                { awayTeamId: parseInt(awayTeamId) },
               ],
             },
             {
               AND: [
-                { homeTeam: { id: parseInt(awayTeamId) } },
-                { awayTeam: { id: parseInt(homeTeamId) } },
+                { homeTeamId: parseInt(awayTeamId) },
+                { awayTeamId: parseInt(homeTeamId) },
               ],
             },
           ],
@@ -147,8 +147,8 @@ export class StatsService {
         orderBy: { scheduledTime: 'desc' },
         take: 10,
         include: {
-          homeTeam: true,
-          awayTeam: true,
+          homeTeamRef: true,
+          awayTeamRef: true,
         },
       });
 
@@ -156,7 +156,7 @@ export class StatsService {
       let totalGoals = 0;
 
       meetings.forEach(match => {
-        const isOriginalHome = match.homeTeam.id === parseInt(homeTeamId);
+        const isOriginalHome = match.homeTeamId === parseInt(homeTeamId);
         const homeScore = isOriginalHome ? match.homeScore : match.awayScore;
         const awayScore = isOriginalHome ? match.awayScore : match.homeScore;
         
@@ -178,8 +178,8 @@ export class StatsService {
         totalMatches: meetings.length,
         avgGoals: meetings.length > 0 ? totalGoals / meetings.length : 0,
         lastMeetings: meetings.slice(0, 5).map(m => ({
-          home: m.homeTeam.name,
-          away: m.awayTeam.name,
+          home: m.homeTeam,
+          away: m.awayTeam,
           homeScore: m.homeScore,
           awayScore: m.awayScore,
           date: m.scheduledTime,

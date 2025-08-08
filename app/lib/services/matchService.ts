@@ -203,7 +203,7 @@ export class MatchService {
   private transformMatch(match: any) {
     return {
       id: match.id.toString(),
-      sportType: reverseSportTypeMap[match.sportType] || match.sportType.toLowerCase(),
+      sportType: reverseSportTypeMap[match.sportType as SportType] || match.sportType.toLowerCase(),
       status: match.status.toLowerCase() as any,
       homeTeam: {
         id: `team-${match.id}-home`,

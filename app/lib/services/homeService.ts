@@ -41,7 +41,7 @@ export class HomeService {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    return await prisma.sportAnalysis.findMany({
+    const analyses = await prisma.sportAnalysis.findMany({
       where: {
         matchDate: {
           gte: today,
@@ -64,6 +64,20 @@ export class HomeService {
       },
       take: 6, // 최대 6개 분석
     });
+
+    // Convert Decimal to number for averageAccuracy
+    return analyses.map(analysis => ({
+      ...analysis,
+      author: {
+        ...analysis.author,
+        analystProfile: analysis.author.analystProfile ? {
+          ...analysis.author.analystProfile,
+          averageAccuracy: analysis.author.analystProfile.averageAccuracy 
+            ? Number(analysis.author.analystProfile.averageAccuracy)
+            : null
+        } : null
+      }
+    }));
   }
 
   /**

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json(
-        ApiResponse.error('Authentication required', 'UNAUTHORIZED'),
+        ApiResponse.error({ code: 'UNAUTHORIZED', message: 'Authentication required' }),
         { status: 401 }
       );
     }
@@ -24,24 +24,20 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const analysisId = parseInt(params.id);
     if (isNaN(analysisId)) {
       return NextResponse.json(
-        ApiResponse.error('Invalid analysis ID', 'INVALID_ID'),
+        ApiResponse.error({ code: 'INVALID_ID', message: 'Invalid analysis ID' }),
         { status: 400 }
       );
     }
 
-    const result = await AnalysisService.toggleLike(analysisId, session.user.id);
+    const result = await AnalysisService.toggleLike(analysisId, parseInt(session.user.id));
 
     return NextResponse.json(
-      ApiResponse.success(
-        result,
-        null,
-        result.liked ? 'Analysis liked' : 'Analysis unliked'
-      )
+      ApiResponse.success(result)
     );
   } catch (error) {
     console.error('Error toggling like:', error);
     return NextResponse.json(
-      ApiResponse.error('Failed to toggle like', 'LIKE_ERROR'),
+      ApiResponse.error({ code: 'LIKE_ERROR', message: 'Failed to toggle like' }),
       { status: 500 }
     );
   }

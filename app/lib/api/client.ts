@@ -28,7 +28,7 @@ class ApiClient {
   private useExternalApi: boolean
 
   constructor() {
-    this.useExternalApi = config.USE_EXTERNAL_API === 'true'
+    this.useExternalApi = config.USE_EXTERNAL_API || false
     this.baseUrl = this.useExternalApi 
       ? config.API_BASE_URL || '' 
       : ''

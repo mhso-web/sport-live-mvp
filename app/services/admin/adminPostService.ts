@@ -43,6 +43,7 @@ export interface AdminPost {
   category: {
     id: number
     name: string
+    slug: string
   }
   _count: {
     comments: number
@@ -420,6 +421,7 @@ export class AdminPostService {
       select: {
         id: true,
         name: true,
+        slug: true,
         boardType: true,
         _count: {
           select: { posts: true }

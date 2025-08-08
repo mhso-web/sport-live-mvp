@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching top analysts:', error);
     return NextResponse.json(
-      ApiResponse.error('Failed to fetch top analysts', 'FETCH_ERROR'),
+      ApiResponse.error('Failed to fetch top analysts', 500, 'FETCH_ERROR'),
       { status: 500 }
     );
   }

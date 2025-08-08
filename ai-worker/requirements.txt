@@ -1,13 +1,141 @@
-langchain==0.2.0
-langchain-openai==0.1.0
-psycopg2-binary==2.9.9
-redis==5.0.0
-python-dotenv==1.0.0
-pydantic==2.7.0
-numpy==1.26.0
-pandas==2.2.0
-scikit-learn==1.4.0
-httpx==0.27.0
-asyncio==3.4.3
-sqlalchemy==2.0.0
-alembic==1.13.0
+# Core dependencies - Updated to latest stable versions as of Dec 2024
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# Celery and task queue - Latest stable versions
+celery[redis]==5.4.0
+flower==2.0.1
+redis==5.2.0
+kombu==5.4.2
+
+# LangChain and AI - MAJOR version updates with breaking changes
+langchain==0.3.12
+langchain-core==0.3.27  # Updated to match langchain-openai requirement
+langchain-community==0.3.11
+langgraph==0.2.74
+langgraph-checkpoint==2.0.10
+langchain-openai==0.2.13
+openai==1.58.1
+tiktoken==0.8.0
+
+# Database - Latest stable versions
+sqlalchemy==2.0.36
+psycopg[binary,pool]==3.2.3
+alembic==1.14.0
+asyncpg==0.30.0
+
+# Data processing - Compatible with langchain
+pandas==2.2.3
+numpy==1.26.4  # LangChain requires numpy<2.0
+scikit-learn==1.5.2
+polars==1.16.0
+
+# Web scraping and HTTP - Latest versions
+beautifulsoup4==4.12.3
+aiohttp==3.11.10
+httpx==0.28.1
+requests==2.32.3
+tenacity==9.0.0
+
+# Monitoring and logging - Latest versions
+sentry-sdk[fastapi]==2.19.2
+python-json-logger==3.2.0
+prometheus-client==0.21.1
+structlog==24.4.0
+rich==13.9.4  # For better console output
+
+# Testing - Latest versions
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-cov==6.0.0
+pytest-mock==3.14.0
+pytest-xdist==3.6.1  # For parallel testing
+faker==33.2.0  # For test data generation
+
+# Development - Latest versions
+black==24.10.0
+ruff==0.8.4  # Modern replacement for flake8
+mypy==1.14.0
+pre-commit==4.0.1
+ipython==8.31.0
+jupyterlab==4.3.3
+
+# Type stubs for better type checking
+types-redis>=4.6.0
+types-requests>=2.32.0
+types-python-dateutil>=2.9.0
+
+# Additional modern utilities
+orjson==3.10.12  # Fast JSON serialization
+msgpack==1.1.0  # Binary serialization
+python-multipart==0.0.19  # For file uploads
+email-validator==2.2.0  # Email validation
+python-jose[cryptography]==3.3.0  # JWT support
+passlib[bcrypt]==1.7.4  # Password hashing
+httptools==0.6.4  # Fast HTTP parsing
+uvloop==0.21.0  # Fast event loop
+websockets==14.1  # WebSocket support
+
+# LangChain ecosystem additions
+langchain-anthropic==0.3.0  # Anthropic Claude support
+langchain-google-genai==2.0.8  # Google AI support
+langsmith==0.2.8  # LangChain tracing and monitoring
+langgraph-checkpoint-postgres==2.0.10  # PostgreSQL checkpointing for LangGraph
+langgraph-sdk==0.1.48  # LangGraph SDK
+langserve==0.3.0  # LangChain serving framework
+
+# Vector stores and embeddings
+chromadb==0.5.23  # Vector database
+faiss-cpu==1.9.0.post1  # Facebook AI Similarity Search
+qdrant-client==1.12.1  # Qdrant vector database client
+pinecone-client==5.0.1  # Pinecone vector database
+
+# Observability and APM
+opentelemetry-api==1.29.0
+opentelemetry-sdk==1.29.0
+opentelemetry-instrumentation-fastapi==0.50b0
+opentelemetry-instrumentation-sqlalchemy==0.50b0
+opentelemetry-instrumentation-redis==0.50b0
+opentelemetry-instrumentation-celery==0.50b0
+
+# Schema validation and serialization
+jsonschema==4.23.0
+marshmallow==3.23.2
+cattrs==24.1.2  # Powerful serialization
+
+# Async utilities
+anyio==4.7.0
+asyncer==0.0.8  # Async utilities from FastAPI creator
+aiocache==0.12.3  # Async caching
+
+# CLI and configuration
+typer==0.15.1  # Modern CLI framework
+click==8.1.8  # Command line interface
+pyyaml==6.0.2
+toml==0.10.2
+
+# Date and time
+python-dateutil==2.9.0.post0
+pytz==2024.2
+tzdata==2024.2
+pendulum==3.0.0  # Better datetime handling
+
+# Security
+cryptography==44.0.0
+# secrets is a built-in Python module, no installation needed
+
+# Rate limiting and caching
+slowapi==0.1.9  # Rate limiting for FastAPI
+cachetools==5.5.0  # Caching utilities
+diskcache==5.6.3  # Disk-based cache
+
+# Background jobs and scheduling
+apscheduler==3.10.4  # Advanced Python Scheduler
+croniter==5.0.1  # Cron expression parser
+
+# Validation and parsing
+pydantic-extra-types==2.10.1  # Extra Pydantic types
+phonenumbers==8.13.51  # Phone number validation

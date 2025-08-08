@@ -68,8 +68,15 @@ class DIContainer {
       )
     )
     
+    this.factories.set('experienceService', () => 
+      new ExperienceService()
+    )
+    
     this.factories.set('userService', () => 
-      new UserService(this.get('userRepository'))
+      new UserService(
+        this.get('userRepository'),
+        this.get('experienceService')
+      )
     )
     
     this.factories.set('boardService', () => 
@@ -77,7 +84,10 @@ class DIContainer {
     )
     
     this.factories.set('partnerService', () => 
-      new PartnerService(this.get('partnerRepository'))
+      new PartnerService(
+        this.get('partnerRepository'),
+        this.get('authService')
+      )
     )
     
     this.factories.set('partnerAdminService', () => 

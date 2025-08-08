@@ -11,6 +11,7 @@ import type { AdminPost, AdminComment } from '@/services/admin/adminPostService'
 interface Category {
   id: number
   name: string
+  slug: string
   categoryType: string
   _count: { posts: number }
 }

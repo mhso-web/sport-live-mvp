@@ -191,7 +191,7 @@ export default function AnalysisList({ initialAnalyses = [], showAuthor = true, 
                   {showAuthor && analysis.author && (
                     <span className="flex items-center gap-1">
                       <img
-                        src={analysis.author.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${analysis.author.username}`}
+                        src={analysis.author.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${analysis.author.displayName}`}
                         alt={analysis.author.displayName}
                         className="w-5 h-5 rounded-full"
                       />

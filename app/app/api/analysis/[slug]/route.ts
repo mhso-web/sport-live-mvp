@@ -78,7 +78,7 @@ export async function PUT(
     const updatedAnalysis = await AnalysisService.update(
       existingAnalysis.id,
       data,
-      session.user.id
+      parseInt(session.user.id)
     );
     
     return ApiResponse.success(updatedAnalysis);
@@ -105,7 +105,7 @@ export async function DELETE(
       return ApiResponse.notFound('Analysis not found');
     }
     
-    if (analysis.authorId !== session.user.id && session.user.role !== 'ADMIN') {
+    if (analysis.authorId !== parseInt(session.user.id) && session.user.role !== 'ADMIN') {
       return ApiResponse.forbidden('Not authorized to delete this analysis');
     }
     
@@ -113,7 +113,7 @@ export async function DELETE(
     await prisma.sportAnalysis.update({
       where: { id: analysis.id },
       data: {
-        status: 'DELETED',
+        status: 'ARCHIVED',
         isPublished: false,
       },
     });

@@ -39,11 +39,13 @@ export function generateAnalysisSeoUrl(params: SeoUrlParams | SimpleSeoUrlParams
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   
-  // Handle both interface types
-  const sportSlug = 'slug' in params.sport ? params.sport.slug : (params as SimpleSeoUrlParams).sportSlug;
-  const leagueSlug = 'slug' in params.league ? params.league.slug : (params as SimpleSeoUrlParams).leagueSlug;
-  const homeTeamSlug = 'slug' in params.homeTeam ? params.homeTeam.slug : (params as SimpleSeoUrlParams).homeTeamSlug;
-  const awayTeamSlug = 'slug' in params.awayTeam ? params.awayTeam.slug : (params as SimpleSeoUrlParams).awayTeamSlug;
+  // Handle both interface types using type guard
+  const isSeoUrlParams = 'sport' in params && typeof params.sport === 'object';
+  
+  const sportSlug = isSeoUrlParams ? (params as SeoUrlParams).sport.slug : (params as SimpleSeoUrlParams).sportSlug;
+  const leagueSlug = isSeoUrlParams ? (params as SeoUrlParams).league.slug : (params as SimpleSeoUrlParams).leagueSlug;
+  const homeTeamSlug = isSeoUrlParams ? (params as SeoUrlParams).homeTeam.slug : (params as SimpleSeoUrlParams).homeTeamSlug;
+  const awayTeamSlug = isSeoUrlParams ? (params as SeoUrlParams).awayTeam.slug : (params as SimpleSeoUrlParams).awayTeamSlug;
   
   return `/analysis/${sportSlug}/${leagueSlug}/${year}/${month}/${homeTeamSlug}-vs-${awayTeamSlug}`;
 }
