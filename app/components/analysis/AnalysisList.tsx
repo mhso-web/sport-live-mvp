@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { SportAnalysis } from '@/types/analysis.types';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { apiRequest } from '@/lib/utils/api';
 
 interface AnalysisListProps {
   initialAnalyses?: SportAnalysis[];
@@ -42,7 +43,7 @@ export default function AnalysisList({ initialAnalyses = [], showAuthor = true, 
         ...(authorId && { authorId: authorId.toString() }),
       });
 
-      const response = await fetch(`/api/analysis?${params}`);
+      const response = await apiRequest(`/api/analysis?${params}`);
       const data = await response.json();
 
       if (data.success) {
